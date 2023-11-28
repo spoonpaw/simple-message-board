@@ -1,0 +1,7 @@
+here is how to apply a background to a page in sveltekit with tailwindcss:
+
+<style lang="postcss">
+       :global(body) {
+           @apply bg-zinc-100;
+       }
+</style>
