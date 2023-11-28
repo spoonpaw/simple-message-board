@@ -46,12 +46,12 @@
 
 
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="flex flex-wrap justify-center gap-6 items-stretch">
             {#each categories as category (category.id)}
-                <a href={`/category/${category.id}`} class="block">
-                    <div class="bg-white shadow-lg rounded-lg p-6 transition duration-150 ease-in-out hover:shadow-xl cursor-pointer">
-                    <h2 class="text-xl font-semibold text-blue-600 mb-2">{category.title}</h2>
-                    <p class="text-gray-600 mb-4">{category.description || 'No description provided.'}</p>
+                <a href={`/category/${category.id}`} class="block w-full md:w-1/2 lg:w-1/3 p-4">
+                    <div class="bg-white shadow-lg rounded-lg p-6 transition duration-150 ease-in-out hover:shadow-xl cursor-pointer h-full flex flex-col">
+                        <h2 class="text-xl font-semibold text-blue-600 mb-2">{category.title}</h2>
+                        <p class="text-gray-600 mb-4 flex-grow">{category.description || 'No description provided.'}</p>
                     </div>
                 </a>
             {/each}
