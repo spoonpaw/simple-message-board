@@ -1,22 +1,14 @@
-<!-- src/routes/category/[slug]/+page.svelte -->
+<!--src/routes/category/[id]/+page.svelte-->
 
 <script lang="ts">
 	import type {PageServerData} from './$types';
 	import {goto} from '$app/navigation';
+	import {LogoutButton} from '$lib/client'; // Import the LogoutButton component
 	import {Icon} from '@steeze-ui/svelte-icon';
-	import {Pin, Lock} from '@steeze-ui/lucide-icons';
+	import {Pin, Lock, ArrowLeftCircle} from '@steeze-ui/lucide-icons';
 
 	export let data: PageServerData;
 	const {username, category, threads} = data;
-
-	async function logout() {
-		const response = await fetch('/logout', {method: 'GET'});
-		if (response.ok) {
-			window.location.href = '/';
-		} else {
-			console.error('Logout failed');
-		}
-	}
 
 	function navigateToBoard() {
 		goto('/board');
@@ -27,22 +19,16 @@
     <div class="container mx-auto py-8 px-4 sm:px-0">
         <div class="flex justify-between items-center mb-6">
             <div>
-                <button
-                        on:click={navigateToBoard}
-                        class="text-blue-500 hover:text-blue-700 font-bold"
-                >
-                    ← Back to Main Board
+                <button on:click={navigateToBoard} class="text-blue-500 hover:text-blue-700 font-bold flex items-center">
+                    <Icon src={ArrowLeftCircle} class="w-5 h-5 mr-1 align-text-bottom"/>
+                    Back to Main Board
                 </button>
+
                 <h1 class="text-3xl font-semibold text-gray-800 mt-2">Category: {category.title}</h1>
             </div>
             <div>
                 <div class="text-lg text-gray-600">Hi {username}!</div>
-                <button
-                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
-                        on:click={logout}
-                >
-                    Logout
-                </button>
+                <LogoutButton/> <!-- Replaced with LogoutButton component -->
             </div>
         </div>
         <p class="text-gray-600 mb-4">{category.description}</p>

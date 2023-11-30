@@ -1,7 +1,9 @@
+// src/routes/category/[id]/+page.server.ts
+
 import {error, redirect} from '@sveltejs/kit';
 import type {RequestEvent} from '@sveltejs/kit';
-import {validateUser} from '$lib/auth'; // Import the validateUser function
-import {pool} from '$lib';
+import {validateUser} from '$lib/server/auth'; // Import the validateUser function
+import {pool} from '$lib/server';
 import type {PageServerData} from "./$types";
 
 // Helper function to fetch threads for a category
@@ -48,7 +50,7 @@ export async function load(requestEvent: RequestEvent): Promise<PageServerData |
 		throw redirect(302, '/'); // Redirect to the login page or any other page as needed
 	}
 
-	const categoryId = params.slug;
+	const categoryId = params.id;
 	if (!categoryId) {
 		throw error(400, 'Category ID is required');
 	}

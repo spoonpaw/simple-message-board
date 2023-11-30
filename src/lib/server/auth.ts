@@ -2,7 +2,7 @@ import { error } from '@sveltejs/kit';
 import cookie from 'cookie';
 import jwt from 'jsonwebtoken';
 import { env } from '$env/dynamic/private';
-import { pool } from '$lib';
+import { pool } from '$lib/server/index';
 import type { RequestEvent } from '@sveltejs/kit';
 
 export interface AuthenticatedUser {

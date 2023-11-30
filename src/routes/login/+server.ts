@@ -1,7 +1,7 @@
 // src/routes/login/+server.ts
 
 import type {RequestEvent, RequestHandler} from '@sveltejs/kit';
-import {pool} from '$lib';
+import {pool} from '$lib/server';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import {env} from '$env/dynamic/private';

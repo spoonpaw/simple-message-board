@@ -1,8 +1,8 @@
 import {redirect} from '@sveltejs/kit';
 import type {RequestEvent} from '@sveltejs/kit';
 import type {PageServerData} from './$types';
-import {validateUser} from '$lib/auth'; // Import the validateUser function
-import {pool} from '$lib';
+import {validateUser} from '$lib/server/auth'; // Import the validateUser function
+import {pool} from '$lib/server';
 
 async function fetchCategories() {
 	try {

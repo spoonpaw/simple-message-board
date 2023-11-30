@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
 import type { PageServerData } from './$types';
-import { validateUser } from '$lib/auth'; // Import the validateUser function
+import { validateUser } from '$lib/server/auth'; // Import the validateUser function
 
 export async function load(requestEvent: RequestEvent): Promise<PageServerData> {
 	try {

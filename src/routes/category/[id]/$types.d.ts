@@ -1,4 +1,4 @@
-// src/routes/category/[slug]/$types.d.ts
+// src/routes/category/[id]/$types.d.ts
 
 // Define the Category interface
 export interface Category {
