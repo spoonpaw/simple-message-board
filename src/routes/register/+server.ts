@@ -9,8 +9,8 @@ import {dev} from '$app/environment';
 import cookie from 'cookie';
 import validator from 'validator';
 
-export const POST: RequestHandler = async (event: RequestEvent) => {
-	const {username, email, password} = await event.request.json();
+export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
+	const {username, email, password} = await requestEvent.request.json();
 
 	// Validate email address format
 	if (!validator.isEmail(email)) {

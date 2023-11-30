@@ -12,6 +12,9 @@
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
+		"@steeze-ui/heroicons": "^2.2.3",
+		"@steeze-ui/lucide-icons": "^1.2.0",
+		"@steeze-ui/svelte-icon": "^1.5.0",
 		"@sveltejs/adapter-auto": "^2.0.0",
 		"@sveltejs/kit": "^1.27.4",
 		"@types/bcrypt": "^5.0.2",

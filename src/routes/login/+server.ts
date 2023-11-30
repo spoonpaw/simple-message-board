@@ -8,8 +8,8 @@ import {env} from '$env/dynamic/private';
 import {dev} from '$app/environment';
 import cookie from 'cookie';
 
-export const POST: RequestHandler = async (event: RequestEvent) => {
-	const {username, password} = await event.request.json();
+export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
+	const {username, password} = await requestEvent.request.json();
 
 	// Ensure the JWT_SECRET is defined
 	const JWT_SECRET = env.JWT_SECRET;

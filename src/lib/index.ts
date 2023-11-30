@@ -6,3 +6,5 @@
 export * from './db/types/dbModels';
 
 export * from './db/pool';
+
+export * from './auth';
