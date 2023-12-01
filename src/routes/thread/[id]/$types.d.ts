@@ -1,6 +1,6 @@
 // src/routes/thread/[id]/$types.d.ts
 
-export interface Thread {
+export interface ThreadView {
 	id: string;
 	category_id: string;
 	user_id: string | null;
@@ -10,10 +10,10 @@ export interface Thread {
 	created_at: string;
 	creator_username: string;
 	category_title: string;
-	posts: Post[];
+	posts: PostView[];
 }
 
-export interface Post {
+export interface PostView {
 	id: string;
 	thread_id: string;
 	user_id: string | null;
@@ -28,5 +28,5 @@ export interface Post {
 export interface PageServerData {
 	username: string;
 	userid: string;
-	thread: Thread;
+	thread: ThreadView;
 }

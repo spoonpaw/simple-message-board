@@ -19,6 +19,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Simple Message Board</title>
+</svelte:head>
+
 {#if loggedIn}
 	<div class="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
 		<div class="text-center">

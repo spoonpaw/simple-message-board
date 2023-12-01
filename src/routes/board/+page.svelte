@@ -1,11 +1,18 @@
+<!--src/routes/board/+page.svelte-->
+
 <script lang="ts">
-	import type { PageServerData, Category } from './$types';
-	import { LogoutButton } from '$lib/client'; // Import the LogoutButton component
+	import type { PageServerData } from './$types';
+	import { LogoutButton } from '$lib/client';
+	import type { Category } from '$lib/shared'; // Import the LogoutButton component
 
 	export let data: PageServerData;
 	let username = data.username;
 	let categories: Category[] = data.categories;
 </script>
+
+<svelte:head>
+	<title>Simple Message Board - Main Board</title>
+</svelte:head>
 
 <div class="min-h-screen bg-gray-50">
 	<div class="container mx-auto py-8 px-4 sm:px-0">

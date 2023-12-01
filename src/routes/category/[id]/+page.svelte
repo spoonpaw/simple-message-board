@@ -15,6 +15,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Simple Message Board - {category.title}</title>
+</svelte:head>
+
 <div class="min-h-screen bg-gray-50">
 	<div class="container mx-auto py-8 px-4 sm:px-0">
 		<div class="flex justify-between items-center mb-6">

@@ -46,6 +46,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Simple Message Board - Register</title>
+</svelte:head>
+
 <div
 	class="min-h-screen bg-gray-100 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8"
 >
@@ -112,7 +116,3 @@
 		</div>
 	</div>
 </div>
-
-<style>
-	/* Additional styles if needed */
-</style>

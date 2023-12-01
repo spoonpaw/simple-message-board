@@ -32,6 +32,10 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Simple Message Board - Login</title>
+</svelte:head>
+
 <div
 	class="min-h-screen bg-gray-100 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8"
 >

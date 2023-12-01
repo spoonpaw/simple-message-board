@@ -3,8 +3,9 @@ import type { RequestEvent } from '@sveltejs/kit';
 import type { PageServerData } from './$types';
 import { validateUser } from '$lib/server/auth'; // Import the validateUser function
 import { pool } from '$lib/server';
+import type { Category } from '$lib/shared';
 
-async function fetchCategories() {
+async function fetchCategories(): Promise<Category[]> {
 	try {
 		console.log('Connecting to database to fetch categories.');
 		const client = await pool.connect();
