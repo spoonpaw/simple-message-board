@@ -1,15 +1,17 @@
 // src/routes/category/[id]/+page.server.ts
 
-import {error, redirect} from '@sveltejs/kit';
-import type {RequestEvent} from '@sveltejs/kit';
-import {validateUser} from '$lib/server/auth'; // Import the validateUser function
-import type {PageServerData} from "./$types";
-import {getThreadsByCategoryId, pool} from "$lib/server";
+import { error, redirect } from '@sveltejs/kit';
+import type { RequestEvent } from '@sveltejs/kit';
+import { validateUser } from '$lib/server/auth'; // Import the validateUser function
+import type { PageServerData } from './$types';
+import { getThreadsByCategoryId, pool } from '$lib/server';
 
 // Helper function to fetch threads for a category
 
-export async function load(requestEvent: RequestEvent): Promise<PageServerData | { status: number, redirect: string }> {
-	const {params} = requestEvent;
+export async function load(
+	requestEvent: RequestEvent
+): Promise<PageServerData | { status: number; redirect: string }> {
+	const { params } = requestEvent;
 
 	const authenticatedUser = await validateUser(requestEvent);
 

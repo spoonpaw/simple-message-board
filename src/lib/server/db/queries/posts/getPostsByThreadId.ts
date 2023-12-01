@@ -5,7 +5,8 @@ import { pool } from '../../pool';
 export async function getPostsByThreadId(threadId: string) {
 	const client = await pool.connect();
 	try {
-		const postsResult = await client.query(`
+		const postsResult = await client.query(
+			`
             SELECT p.*, 
                    u.username as author_username,
                    u.id as author_id
@@ -13,9 +14,11 @@ export async function getPostsByThreadId(threadId: string) {
             JOIN users u ON p.user_id = u.id
             WHERE p.thread_id = $1
             ORDER BY p.created_at ASC
-        `, [threadId]);
+        `,
+			[threadId]
+		);
 
-		return postsResult.rows.map(row => ({
+		return postsResult.rows.map((row) => ({
 			id: row.id,
 			content: row.content,
 			authorUsername: row.author_username,

@@ -8,5 +8,5 @@ export const pool = new Pool({
 	host: env.DB_HOST,
 	database: env.DB_NAME,
 	password: env.DB_PASSWORD,
-	port: parseInt(env.DB_PORT || '5432', 10),
+	port: parseInt(env.DB_PORT || '5432', 10)
 });

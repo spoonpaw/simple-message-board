@@ -5,7 +5,8 @@ import { pool } from '../../pool';
 export async function getThreadById(threadId: string) {
 	const client = await pool.connect();
 	try {
-		const threadResult = await client.query(`
+		const threadResult = await client.query(
+			`
             SELECT t.*, 
                    u.username as creator_username,
                    c.title as category_title
@@ -13,7 +14,9 @@ export async function getThreadById(threadId: string) {
             JOIN users u ON t.user_id = u.id
             JOIN categories c ON t.category_id = c.id
             WHERE t.id = $1
-        `, [threadId]);
+        `,
+			[threadId]
+		);
 
 		if (threadResult.rows.length === 0) {
 			return null;

@@ -4,7 +4,7 @@ import { error, redirect } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
 import { validateUser } from '$lib/server/auth';
 import { getThreadById } from '$lib/server/db/queries/threads/getThreadById';
-import {getPostsByThreadId} from "$lib/server";
+import { getPostsByThreadId } from '$lib/server';
 
 export async function load(requestEvent: RequestEvent) {
 	const { params } = requestEvent;

@@ -1,7 +1,7 @@
 // src/routes/logout/+server.ts
 
 import cookie from 'cookie';
-import {dev} from '$app/environment';
+import { dev } from '$app/environment';
 
 export const GET = async () => {
 	// Clear the httpOnly cookie by overwriting it with an expired one

@@ -1,20 +1,20 @@
 // src/routes/register/+server.ts
 
-import type {RequestEvent, RequestHandler} from '@sveltejs/kit';
-import {pool} from '$lib/server';
+import type { RequestEvent, RequestHandler } from '@sveltejs/kit';
+import { pool } from '$lib/server';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import {env} from '$env/dynamic/private';
-import {dev} from '$app/environment';
+import { env } from '$env/dynamic/private';
+import { dev } from '$app/environment';
 import cookie from 'cookie';
 import validator from 'validator';
 
 export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
-	const {username, email, password} = await requestEvent.request.json();
+	const { username, email, password } = await requestEvent.request.json();
 
 	// Validate email address format
 	if (!validator.isEmail(email)) {
-		return new Response(JSON.stringify({error: 'Invalid email address.'}), {
+		return new Response(JSON.stringify({ error: 'Invalid email address.' }), {
 			status: 400,
 			headers: {
 				'Content-Type': 'application/json'
@@ -27,16 +27,16 @@ export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
 
 	try {
 		// Check if email/username exists
-		const result = await client.query(
-			'SELECT 1 FROM users WHERE email = $1 OR username = $2',
-			[email, username]
-		);
+		const result = await client.query('SELECT 1 FROM users WHERE email = $1 OR username = $2', [
+			email,
+			username
+		]);
 
 		const userCount = result.rowCount ?? 0;
 
 		if (userCount > 0) {
 			client.release();
-			return new Response(JSON.stringify({error: 'Username or email already exists.'}), {
+			return new Response(JSON.stringify({ error: 'Username or email already exists.' }), {
 				status: 409,
 				headers: {
 					'Content-Type': 'application/json'
@@ -58,9 +58,9 @@ export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
 		// Immediately log in the user by generating a JWT token
 		const JWT_SECRET = env.JWT_SECRET || 'your-secret-should-not-be-here';
 		const token = jwt.sign(
-			{userId: newUser.id, username: newUser.username},
+			{ userId: newUser.id, username: newUser.username },
 			JWT_SECRET,
-			{expiresIn: '1h'} // Token expires in 1 hour
+			{ expiresIn: '1h' } // Token expires in 1 hour
 		);
 
 		// Set the httpOnly cookie
@@ -73,7 +73,7 @@ export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
 		});
 
 		client.release();
-		return new Response(JSON.stringify({message: 'User created successfully.', user: newUser}), {
+		return new Response(JSON.stringify({ message: 'User created successfully.', user: newUser }), {
 			status: 201,
 			headers: {
 				'Content-Type': 'application/json',
@@ -83,7 +83,7 @@ export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
 	} catch (error) {
 		console.error('Database error:', error);
 		client.release();
-		return new Response(JSON.stringify({error: 'Failed to create user.'}), {
+		return new Response(JSON.stringify({ error: 'Failed to create user.' }), {
 			status: 500,
 			headers: {
 				'Content-Type': 'application/json'

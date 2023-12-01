@@ -1,12 +1,12 @@
-import {redirect} from '@sveltejs/kit';
-import type {RequestEvent} from '@sveltejs/kit';
-import type {PageServerData} from './$types';
-import {validateUser} from '$lib/server/auth'; // Import the validateUser function
-import {pool} from '$lib/server';
+import { redirect } from '@sveltejs/kit';
+import type { RequestEvent } from '@sveltejs/kit';
+import type { PageServerData } from './$types';
+import { validateUser } from '$lib/server/auth'; // Import the validateUser function
+import { pool } from '$lib/server';
 
 async function fetchCategories() {
 	try {
-		console.log("Connecting to database to fetch categories.");
+		console.log('Connecting to database to fetch categories.');
 		const client = await pool.connect();
 		const result = await client.query('SELECT * FROM categories');
 		const categories = result.rows;
@@ -20,23 +20,22 @@ async function fetchCategories() {
 }
 
 export async function load(requestEvent: RequestEvent): Promise<PageServerData> {
-	console.log("Starting load function for board page.");
+	console.log('Starting load function for board page.');
 
 	const authenticatedUser = await validateUser(requestEvent);
 
 	if (!authenticatedUser) {
-		console.log("No authenticated user, redirecting to root.");
+		console.log('No authenticated user, redirecting to root.');
 		throw redirect(302, '/');
 	}
 
-	console.log("User authenticated, fetching categories.");
+	console.log('User authenticated, fetching categories.');
 	const categories = await fetchCategories();
 
-	console.log("Returning data for board page.");
+	console.log('Returning data for board page.');
 	return {
 		username: authenticatedUser.username,
 		userid: authenticatedUser.id,
-		categories: categories,
+		categories: categories
 	};
-
 }

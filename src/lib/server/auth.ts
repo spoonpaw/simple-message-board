@@ -11,11 +11,11 @@ export interface AuthenticatedUser {
 }
 
 export async function validateUser(requestEvent: RequestEvent): Promise<AuthenticatedUser | null> {
-	console.log("Starting validateUser function.");
+	console.log('Starting validateUser function.');
 
 	const JWT_SECRET = env.JWT_SECRET as string;
 	if (!JWT_SECRET) {
-		console.error("JWT_SECRET is not defined.");
+		console.error('JWT_SECRET is not defined.');
 		throw error(500, 'JWT_SECRET is not defined.');
 	}
 
@@ -24,15 +24,15 @@ export async function validateUser(requestEvent: RequestEvent): Promise<Authenti
 	const token = cookies['token'];
 
 	if (!token) {
-		console.log("No token found in cookies, returning null.");
+		console.log('No token found in cookies, returning null.');
 		return null;
 	}
 
 	try {
-		console.log("Verifying JWT token.");
+		console.log('Verifying JWT token.');
 		const decodedToken = jwt.verify(token, JWT_SECRET);
 		if (typeof decodedToken !== 'object' || decodedToken === null) {
-			console.log("Invalid token, returning null.");
+			console.log('Invalid token, returning null.');
 			return null;
 		}
 
@@ -41,18 +41,20 @@ export async function validateUser(requestEvent: RequestEvent): Promise<Authenti
 
 		const client = await pool.connect();
 		try {
-			const userResult = await client.query('SELECT id, username FROM users WHERE id = $1', [userId]);
+			const userResult = await client.query('SELECT id, username FROM users WHERE id = $1', [
+				userId
+			]);
 			if (userResult.rowCount === 0) {
 				console.log(`No user found for ID: ${userId}, returning null.`);
 				return null;
 			}
-			console.log("User found, returning user data.");
+			console.log('User found, returning user data.');
 			return userResult.rows[0];
 		} finally {
 			client.release();
 		}
 	} catch (err) {
-		console.error("Error during token verification, returning null.", err);
+		console.error('Error during token verification, returning null.', err);
 		return null;
 	}
 }

@@ -1,13 +1,13 @@
 // src/routes/post/[id]/+server.ts
 
-import type {RequestEvent} from '@sveltejs/kit';
-import {validateUser} from '$lib/server/auth';
-import {getPostsByThreadId, pool} from '$lib/server';
-import {error, json} from '@sveltejs/kit';
+import type { RequestEvent } from '@sveltejs/kit';
+import { validateUser } from '$lib/server/auth';
+import { getPostsByThreadId, pool } from '$lib/server';
+import { error, json } from '@sveltejs/kit';
 
 export async function PUT(requestEvent: RequestEvent) {
-	const {params, request} = requestEvent;
-	console.log("PUT request received for post ID:", params.id);
+	const { params, request } = requestEvent;
+	console.log('PUT request received for post ID:', params.id);
 
 	const authenticatedUser = await validateUser(requestEvent);
 	if (!authenticatedUser) {
@@ -19,7 +19,7 @@ export async function PUT(requestEvent: RequestEvent) {
 
 	try {
 		const requestData = await request.json();
-		console.log("Request Data:", requestData);
+		console.log('Request Data:', requestData);
 
 		const threadId = requestData.threadId;
 		const content = requestData.content; // Retrieve the updated content from the request body
@@ -27,7 +27,9 @@ export async function PUT(requestEvent: RequestEvent) {
 		const client = await pool.connect();
 		try {
 			// Similar check for thread locked status
-			const threadResult = await client.query('SELECT locked FROM threads WHERE id = $1', [threadId]);
+			const threadResult = await client.query('SELECT locked FROM threads WHERE id = $1', [
+				threadId
+			]);
 			if (threadResult.rows.length === 0) {
 				return error(404, 'Thread not found');
 			}
@@ -35,9 +37,9 @@ export async function PUT(requestEvent: RequestEvent) {
 				return error(403, 'Thread is locked');
 			}
 
-            // Update the post, including the updated_at field
+			// Update the post, including the updated_at field
 			const updateResult = await client.query(
-                'UPDATE posts SET content = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 AND user_id = $3 RETURNING *',
+				'UPDATE posts SET content = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 AND user_id = $3 RETURNING *',
 				[content, postId, authenticatedUser.id]
 			);
 
@@ -50,28 +52,27 @@ export async function PUT(requestEvent: RequestEvent) {
 			const updatedPosts = await getPostsByThreadId(threadId);
 
 			return json(updatedPosts);
-
 		} catch (err) {
-			console.error("Error processing PUT request:", err);
+			console.error('Error processing PUT request:', err);
 			return error(500, 'Server Error');
 		} finally {
 			client.release();
 		}
 	} catch (err) {
-		console.error("Error parsing request JSON:", err);
+		console.error('Error parsing request JSON:', err);
 		return error(400, 'Bad Request: Invalid JSON');
 	}
 }
 
 export async function DELETE(requestEvent: RequestEvent) {
-	const {params, request} = requestEvent;
+	const { params, request } = requestEvent;
 	const authenticatedUser = await validateUser(requestEvent);
 	if (!authenticatedUser) {
 		return error(401, 'Unauthorized');
 	}
 
 	const postId = params.id;
-	const {threadId} = await request.json(); // Retrieve the thread ID from the request body
+	const { threadId } = await request.json(); // Retrieve the thread ID from the request body
 
 	const client = await pool.connect();
 	try {
@@ -85,7 +86,10 @@ export async function DELETE(requestEvent: RequestEvent) {
 		}
 
 		// Delete the post
-		const deleteResult = await client.query('DELETE FROM posts WHERE id = $1 AND user_id = $2', [postId, authenticatedUser.id]);
+		const deleteResult = await client.query('DELETE FROM posts WHERE id = $1 AND user_id = $2', [
+			postId,
+			authenticatedUser.id
+		]);
 
 		// Check if the post was actually deleted
 		if (deleteResult.rowCount === 0) {
@@ -96,7 +100,6 @@ export async function DELETE(requestEvent: RequestEvent) {
 		const updatedPosts = await getPostsByThreadId(threadId);
 
 		return json(updatedPosts);
-
 	} catch (err) {
 		console.error(err);
 		return error(500, 'Server Error');

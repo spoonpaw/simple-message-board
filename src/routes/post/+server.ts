@@ -22,22 +22,26 @@ export async function POST(requestEvent: RequestEvent) {
 
 	const client = await pool.connect();
 	try {
-        // Check if the thread is locked
-        const threadResult = await client.query('SELECT locked FROM threads WHERE id = $1', [threadId]);
-        if (threadResult.rows.length === 0) {
-            return error(404, 'Thread not found');
-        }
-        if (threadResult.rows[0].locked) {
-            return error(403, 'Thread is locked');
-        }
+		// Check if the thread is locked
+		const threadResult = await client.query('SELECT locked FROM threads WHERE id = $1', [threadId]);
+		if (threadResult.rows.length === 0) {
+			return error(404, 'Thread not found');
+		}
+		if (threadResult.rows[0].locked) {
+			return error(403, 'Thread is locked');
+		}
 
-        // Insert the new post
-		await client.query('INSERT INTO posts (thread_id, user_id, content) VALUES ($1, $2, $3)', [threadId, authenticatedUser.id, content]);
+		// Insert the new post
+		await client.query('INSERT INTO posts (thread_id, user_id, content) VALUES ($1, $2, $3)', [
+			threadId,
+			authenticatedUser.id,
+			content
+		]);
 
-        // Fetch updated posts after the insertion
-        const updatedPosts = await getPostsByThreadId(threadId);
+		// Fetch updated posts after the insertion
+		const updatedPosts = await getPostsByThreadId(threadId);
 
-        return json(updatedPosts);
+		return json(updatedPosts);
 	} catch (err) {
 		console.error(err);
 		return error(500, 'Server Error');
