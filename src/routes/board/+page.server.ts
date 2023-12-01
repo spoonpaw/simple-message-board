@@ -35,6 +35,7 @@ export async function load(requestEvent: RequestEvent): Promise<PageServerData> 
 	console.log("Returning data for board page.");
 	return {
 		username: authenticatedUser.username,
+		userid: authenticatedUser.id,
 		categories: categories,
 	};
 

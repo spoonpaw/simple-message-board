@@ -2,6 +2,7 @@
 
 export interface PageServerData {
 	username: string;
+	userid: string;
 	categories: Category[]; // Add this line to include categories
 	// ... any other properties you expect to pass to your page component
 }

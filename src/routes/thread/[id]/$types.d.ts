@@ -22,9 +22,11 @@ export interface Post {
 	createdAt: string;
 	updatedAt: string;
 	authorUsername: string;
+	authorId: string;
 }
 
 export interface PageServerData {
 	username: string;
+	userid: string;
 	thread: Thread;
 }

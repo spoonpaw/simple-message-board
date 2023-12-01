@@ -8,3 +8,9 @@ export * from './db/types/dbModels';
 export * from './db/pool';
 
 export * from './auth';
+
+export * from './db/queries/threads/getThreadsByCategoryId';
+
+export * from './db/queries/threads/getThreadById';
+
+export * from './db/queries/posts/getPostsByThreadId';
