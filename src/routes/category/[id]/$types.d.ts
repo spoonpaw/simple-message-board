@@ -21,6 +21,7 @@ export interface Thread {
     creator_username: string; // Username of the thread creator
     reply_count: number; // Number of replies to the thread
     last_replier_username: string | null; // Username of the last person who replied
+	last_reply_at: Date | null; // Date of the last reply
 }
 
 // Define the PageServerData interface for this route

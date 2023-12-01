@@ -47,10 +47,10 @@
                             {/if}
                         </div>
                         <div class="text-sm text-gray-500">
-                            <p>Started by {thread.creator_username}</p>
+                            <p>Started by {thread.creator_username} on: {new Date(thread.created_at).toLocaleString()}</p>
                             <p>{thread.reply_count} {thread.reply_count === 1 ? 'reply' : 'replies'}</p>
-                            {#if thread.reply_count > 0}
-                                <p>Last reply by {thread.last_replier_username}</p>
+                            {#if thread.last_reply_at}
+                                <p>Last reply by {thread.last_replier_username} on: {new Date(thread.last_reply_at).toLocaleString()}</p>
                             {/if}
                         </div>
                     </div>
