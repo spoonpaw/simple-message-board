@@ -139,11 +139,13 @@
 					{/if}
 				</div>
 			</div>
-			<div>
+			<div class="flex space-x-4">
 				<div class="text-lg text-gray-600">Hi {username}!</div>
 				<LogoutButton />
-				<!-- LogoutButton component -->
+				<!-- Use the LogoutButton component -->
 			</div>
+
+
 		</div>
 
 		<!-- Thread Content and Posts -->
@@ -155,12 +157,14 @@
 							<button
 								on:click={() => editPost(post.id, post.content)}
 								class="focus:outline-none hover:bg-blue-100 p-1 rounded mr-1"
+								title="Edit Post"
 							>
 								<Icon src={Pencil} class="w-4 h-4 text-blue-500" />
 							</button>
 							<button
 								on:click={() => deletePost(post.id)}
 								class="focus:outline-none hover:bg-red-100 p-1 rounded"
+								title="Delete Post"
 							>
 								<Icon src={Trash} class="w-4 h-4 text-red-500" />
 							</button>

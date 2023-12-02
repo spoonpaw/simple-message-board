@@ -33,11 +33,12 @@
 
 				<h1 class="text-3xl font-semibold text-gray-800 mt-2">Category: {category.title}</h1>
 			</div>
-			<div>
+			<div class="flex space-x-4">
 				<div class="text-lg text-gray-600">Hi {username}!</div>
 				<LogoutButton />
-				<!-- Replaced with LogoutButton component -->
+				<!-- Use the LogoutButton component -->
 			</div>
+
 		</div>
 		<p class="text-gray-600 mb-4">{category.description}</p>
 

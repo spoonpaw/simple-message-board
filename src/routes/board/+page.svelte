@@ -19,11 +19,13 @@
 		<div class="flex justify-between items-center mb-6">
 			<h1 class="text-3xl font-semibold text-gray-800">Message Board</h1>
 
-			<div>
+			<div class="flex space-x-4">
 				<div class="text-lg text-gray-600">Hi {username}!</div>
 				<LogoutButton />
 				<!-- Use the LogoutButton component -->
 			</div>
+
+
 		</div>
 		<div class="flex flex-wrap justify-center gap-6 items-stretch">
 			{#each categories as category (category.id)}

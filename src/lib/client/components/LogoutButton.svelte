@@ -1,5 +1,7 @@
 <script>
 	import { goto } from '$app/navigation';
+	import { Icon } from '@steeze-ui/svelte-icon';
+	import { LogOut } from '@steeze-ui/lucide-icons';
 
 	async function logout() {
 		const response = await fetch('/logout', { method: 'GET' });
@@ -12,8 +14,9 @@
 </script>
 
 <button
-	class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150 ease-in-out"
 	on:click={logout}
+    class="focus:outline-none hover:bg-blue-100 p-1 rounded"
+    title="Logout"
 >
-	Logout
+    <Icon src={LogOut} class="w-4 h-4 text-blue-500" />
 </button>
