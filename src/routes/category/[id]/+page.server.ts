@@ -1,23 +1,22 @@
 // src/routes/category/[id]/+page.server.ts
 
-import { error, redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
-import { validateUser } from '$lib/server/auth'; // Import the validateUser function
+import { validateUser } from '$lib/server/auth';
 import type { PageServerData } from './$types';
 import { getThreadsByCategoryId, pool } from '$lib/server';
 
-// Helper function to fetch threads for a category
-
-export async function load(
-	requestEvent: RequestEvent
-): Promise<PageServerData | { status: number; redirect: string }> {
+export async function load(requestEvent: RequestEvent): Promise<PageServerData> {
 	const { params } = requestEvent;
 
+	// Try to validate the user; if not authenticated, proceed as 'Anonymous'
 	const authenticatedUser = await validateUser(requestEvent);
+	let username = 'Anonymous';
+	let userid: string | undefined = undefined;
 
-	// Handle redirection for unauthenticated users
-	if (!authenticatedUser) {
-		throw redirect(302, '/'); // Redirect to the login page or any other page as needed
+	if (authenticatedUser) {
+		username = authenticatedUser.username;
+		userid = authenticatedUser.id;
 	}
 
 	const categoryId = params.id;
@@ -41,8 +40,8 @@ export async function load(
 	client.release();
 
 	return {
-		username: authenticatedUser.username,
-		userid: authenticatedUser.id,
+		username,
+		userid,
 		category,
 		threads
 	};

@@ -15,18 +15,16 @@ export interface ThreadView {
 
 export interface PostView {
 	id: string;
-	thread_id: string;
-	user_id: string | null;
 	content: string;
-	quoted_post_id: string | null;
 	createdAt: string;
 	updatedAt: string;
 	authorUsername: string;
 	authorId: string;
+	authorProfileImageUrl: string;
 }
 
 export interface PageServerData {
 	username: string;
-	userid: string;
+	userid?: string;
 	thread: ThreadView;
 }

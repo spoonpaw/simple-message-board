@@ -2,12 +2,21 @@
 
 <script lang="ts">
 	import type { PageServerData } from './$types';
-	import { LogoutButton } from '$lib/client';
-	import type { Category } from '$lib/shared'; // Import the LogoutButton component
+	import type { Category } from '$lib/shared';
+	import { goto } from '$app/navigation';
+	import { Icon } from '@steeze-ui/svelte-icon';
+	import { Home } from '@steeze-ui/lucide-icons';
+	import UserStatusHeader from '$lib/client/components/UserStatusHeader.svelte'; // Import the icon for the home button
 
 	export let data: PageServerData;
 	let username = data.username;
+	let userid = data.userid;
 	let categories: Category[] = data.categories;
+	let isLoggedIn = !!data.userid;
+
+	function navigateToHome() {
+		goto('/');
+	}
 </script>
 
 <svelte:head>
@@ -17,15 +26,16 @@
 <div class="min-h-screen bg-gray-50">
 	<div class="container mx-auto py-8 px-4 sm:px-0">
 		<div class="flex justify-between items-center mb-6">
+			<button
+				on:click={navigateToHome}
+				class="text-blue-500 hover:text-blue-700 font-bold flex items-center"
+			>
+				<Icon src={Home} class="w-5 h-5 mr-1 align-text-bottom" />
+				Home
+			</button>
+
 			<h1 class="text-3xl font-semibold text-gray-800">Message Board</h1>
-
-			<div class="flex space-x-4">
-				<div class="text-lg text-gray-600">Hi {username}!</div>
-				<LogoutButton />
-				<!-- Use the LogoutButton component -->
-			</div>
-
-
+			<UserStatusHeader {isLoggedIn} {username} userId={userid ?? ''} />
 		</div>
 		<div class="flex flex-wrap justify-center gap-6 items-stretch">
 			{#each categories as category (category.id)}

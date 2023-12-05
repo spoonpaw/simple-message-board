@@ -1,4 +1,5 @@
-import { redirect } from '@sveltejs/kit';
+// src/routes/board/+page.server.ts
+
 import type { RequestEvent } from '@sveltejs/kit';
 import type { PageServerData } from './$types';
 import { validateUser } from '$lib/server/auth'; // Import the validateUser function
@@ -24,19 +25,24 @@ export async function load(requestEvent: RequestEvent): Promise<PageServerData> 
 	console.log('Starting load function for board page.');
 
 	const authenticatedUser = await validateUser(requestEvent);
+	let username, userid;
 
 	if (!authenticatedUser) {
-		console.log('No authenticated user, redirecting to root.');
-		throw redirect(302, '/');
+		console.log('No authenticated user, viewing anonymously.');
+		username = 'Anonymous';
+		// userid is not set for anonymous users
+	} else {
+		console.log('User authenticated, fetching categories.');
+		username = authenticatedUser.username;
+		userid = authenticatedUser.id;
 	}
 
-	console.log('User authenticated, fetching categories.');
 	const categories = await fetchCategories();
 
 	console.log('Returning data for board page.');
 	return {
-		username: authenticatedUser.username,
-		userid: authenticatedUser.id,
+		username: username,
+		userid: userid, // This can be undefined for anonymous users
 		categories: categories
 	};
 }

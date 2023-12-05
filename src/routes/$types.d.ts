@@ -2,4 +2,5 @@
 
 export interface PageServerData {
 	username?: string;
+	userid?: string;
 }

@@ -3,10 +3,10 @@
 <script lang="ts">
 	import type { PageServerData } from './$types';
 	import { goto } from '$app/navigation';
-	import { LogoutButton } from '$lib/client';
 	import { Icon } from '@steeze-ui/svelte-icon';
 	import { ArrowLeftCircle, Lock, Pencil, Pin, Trash } from '@steeze-ui/lucide-icons';
 	import Modal from '$lib/client/components/Modal.svelte';
+	import UserStatusHeader from '$lib/client/components/UserStatusHeader.svelte';
 
 	let newPostModal = false; // Modal for submitting a new post
 	let editPostModal = false; // Modal for modifying an existing post
@@ -15,6 +15,7 @@
 
 	export let data: PageServerData;
 	let { username, userid, thread } = data;
+	const isLoggedIn = !!userid;
 
 	function navigateToCategory() {
 		goto(`/category/${thread.category_id}`);
@@ -139,19 +140,14 @@
 					{/if}
 				</div>
 			</div>
-			<div class="flex space-x-4">
-				<div class="text-lg text-gray-600">Hi {username}!</div>
-				<LogoutButton />
-				<!-- Use the LogoutButton component -->
-			</div>
 
-
+			<UserStatusHeader {isLoggedIn} {username} userId={userid ?? ''} />
 		</div>
 
 		<!-- Thread Content and Posts -->
 		<div class="mb-4">
 			{#each thread.posts as post (post.id)}
-				<div class="bg-white shadow p-4 rounded-lg mt-4 relative">
+				<div class="bg-white shadow p-4 rounded-lg mt-4 relative flex">
 					{#if post.authorId === userid}
 						<div class="absolute top-0 right-0 pt-2 pr-2 flex">
 							<button
@@ -170,22 +166,48 @@
 							</button>
 						</div>
 					{/if}
-					<p class="font-semibold">{post.authorUsername}</p>
-					<p>{post.content}</p>
-					<p class="text-sm text-gray-500">
-						Posted on: {new Date(post.createdAt).toLocaleString()}
-					</p>
-					{#if post.updatedAt}
-						<p class="text-sm text-gray-500">
-							Last updated at: {new Date(post.updatedAt).toLocaleString()}
+
+					<!-- Author Info Container -->
+					<div class="flex flex-col items-center w-24">
+						<!-- Username -->
+						<div class="font-semibold text-blue-500 hover:text-blue-700 w-full text-center">
+							<a href={`/user/${post.authorId}`} class="block truncate w-full"
+								>{post.authorUsername}</a
+							>
+						</div>
+						<!-- Profile Image -->
+						<div class="w-20 h-20 rounded-full mt-1">
+							<a href={`/user/${post.authorId}`}>
+								<img
+									src={post.authorProfileImageUrl}
+									alt="Profile picture of {post.authorUsername}"
+									class="w-full h-full object-cover rounded-full"
+								/>
+							</a>
+						</div>
+					</div>
+
+					<!-- Content -->
+					<div class="ml-10">
+						<p>{post.content}</p>
+					</div>
+					<!-- Additional Details -->
+					<div class="flex flex-col justify-end ml-auto text-sm text-gray-500">
+						<p>
+							Posted on: {new Date(post.createdAt).toLocaleString()}
 						</p>
-					{/if}
+						{#if post.updatedAt}
+							<p>
+								Last updated at: {new Date(post.updatedAt).toLocaleString()}
+							</p>
+						{/if}
+					</div>
 				</div>
 			{/each}
 		</div>
 	</div>
 
-	{#if !thread.locked}
+	{#if !thread.locked && isLoggedIn}
 		<button
 			class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
 			on:click={toggleNewPostModal}

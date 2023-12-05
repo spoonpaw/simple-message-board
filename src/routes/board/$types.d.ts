@@ -4,6 +4,6 @@ import type { Category } from '$lib/shared';
 
 export interface PageServerData {
 	username: string;
-	userid: string;
+	userid?: string;
 	categories: Category[]; // Add this line to include categories
 }

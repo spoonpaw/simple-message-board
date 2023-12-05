@@ -9,6 +9,7 @@ export interface User {
 	last_login: Date | null;
 	confirmation_token: string;
 	is_confirmed: boolean;
+	profile_image_url: string;
 }
 
 export interface Category {

@@ -1,17 +1,20 @@
 // src/routes/thread/[id]/+page.server.ts
 
-import { error, redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
 import { validateUser } from '$lib/server/auth';
-import { getThreadById } from '$lib/server/db/queries/threads/getThreadById';
-import { getPostsByThreadId } from '$lib/server';
+import { getThreadById, getPostsByThreadId } from '$lib/server';
 
 export async function load(requestEvent: RequestEvent) {
 	const { params } = requestEvent;
 
 	const authenticatedUser = await validateUser(requestEvent);
-	if (!authenticatedUser) {
-		throw redirect(302, '/');
+	let username = 'Anonymous';
+	let userid: string | undefined = undefined;
+
+	if (authenticatedUser) {
+		username = authenticatedUser.username;
+		userid = authenticatedUser.id;
 	}
 
 	const threadId = params.id;
@@ -27,8 +30,8 @@ export async function load(requestEvent: RequestEvent) {
 	const posts = await getPostsByThreadId(threadId);
 
 	return {
-		username: authenticatedUser.username,
-		userid: authenticatedUser.id,
+		username,
+		userid,
 		thread: {
 			...thread,
 			posts: posts

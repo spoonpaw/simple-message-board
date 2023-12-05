@@ -15,7 +15,10 @@ export async function load(requestEvent: RequestEvent): Promise<PageServerData> 
 		}
 
 		// User is authenticated, return their username
-		return { username: authenticatedUser.username };
+		return {
+			username: authenticatedUser.username,
+			userid: authenticatedUser.id
+		};
 	} catch (err) {
 		console.error('Error during user validation:', err);
 		throw error(500, 'Internal Server Error');

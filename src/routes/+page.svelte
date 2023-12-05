@@ -11,7 +11,6 @@
 		const response = await fetch('/logout', { method: 'GET' });
 
 		if (response.ok) {
-			// Instead of using goto, perform a full page reload
 			window.location.reload();
 		} else {
 			console.error('Logout failed');
@@ -29,7 +28,7 @@
 			<h1 class="text-5xl font-bold text-gray-800 mb-8">
 				Welcome to the Simple Message Board, {data.username}!
 			</h1>
-			<nav class="space-x-4">
+			<nav class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 justify-center">
 				<button
 					on:click={logout}
 					class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
@@ -37,10 +36,17 @@
 					Logout
 				</button>
 				<a
-					href="/board"
-					class="inline-block px-6 py-3 bg-gray-600 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700 transition duration-300"
-					>Go to Board</a
+					href={`/user/${data.userid}`}
+					class="inline-block px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 transition duration-300"
 				>
+					View Profile
+				</a>
+				<a
+					href="/board"
+					class="inline-block px-6 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-300"
+				>
+					Go to Board
+				</a>
 			</nav>
 		</div>
 	</div>
@@ -48,17 +54,25 @@
 	<div class="min-h-screen bg-gray-50 flex flex-col items-center justify-center">
 		<div class="text-center">
 			<h1 class="text-5xl font-bold text-gray-800 mb-8">Welcome to the Simple Message Board!</h1>
-			<nav class="space-x-4">
+			<nav class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 justify-center">
 				<a
 					href="/register"
 					class="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
-					>Register</a
 				>
+					Register
+				</a>
 				<a
 					href="/login"
 					class="inline-block px-6 py-3 bg-gray-600 text-white font-semibold rounded-lg shadow-md hover:bg-gray-700 transition duration-300"
-					>Login</a
 				>
+					Login
+				</a>
+				<a
+					href="/board"
+					class="inline-block px-6 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-300"
+				>
+					View Board Anonymously
+				</a>
 			</nav>
 		</div>
 	</div>

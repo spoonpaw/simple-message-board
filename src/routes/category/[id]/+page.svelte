@@ -3,12 +3,13 @@
 <script lang="ts">
 	import type { PageServerData } from './$types';
 	import { goto } from '$app/navigation';
-	import { LogoutButton } from '$lib/client'; // Import the LogoutButton component
 	import { Icon } from '@steeze-ui/svelte-icon';
 	import { Pin, Lock, ArrowLeftCircle } from '@steeze-ui/lucide-icons';
+	import UserStatusHeader from '$lib/client/components/UserStatusHeader.svelte';
 
 	export let data: PageServerData;
-	const { username, category, threads } = data;
+	const { username, userid, category, threads } = data;
+	const isLoggedIn = !!userid;
 
 	function navigateToBoard() {
 		goto('/board');
@@ -33,12 +34,8 @@
 
 				<h1 class="text-3xl font-semibold text-gray-800 mt-2">Category: {category.title}</h1>
 			</div>
-			<div class="flex space-x-4">
-				<div class="text-lg text-gray-600">Hi {username}!</div>
-				<LogoutButton />
-				<!-- Use the LogoutButton component -->
-			</div>
 
+			<UserStatusHeader {isLoggedIn} {username} userId={userid ?? ''} />
 		</div>
 		<p class="text-gray-600 mb-4">{category.description}</p>
 
