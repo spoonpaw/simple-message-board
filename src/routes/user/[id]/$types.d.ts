@@ -5,6 +5,7 @@ export interface UserProfile {
 	username: string;
 	email: string;
 	profileImageUrl: string;
+	isOwnProfile: boolean; // Indicates if the authenticated user is viewing their own profile
 	// Include other properties specific to the user profile as needed
 }
 

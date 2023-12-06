@@ -171,9 +171,9 @@
 					<div class="flex flex-col items-center w-24">
 						<!-- Username -->
 						<div class="font-semibold text-blue-500 hover:text-blue-700 w-full text-center">
-							<a href={`/user/${post.authorId}`} class="block truncate w-full"
-								>{post.authorUsername}</a
-							>
+							<a href={`/user/${post.authorId}`} class="block truncate w-full" title="{post.authorUsername}">
+								{post.authorUsername}
+							</a>
 						</div>
 						<!-- Profile Image -->
 						<div class="w-20 h-20 rounded-full mt-1">
