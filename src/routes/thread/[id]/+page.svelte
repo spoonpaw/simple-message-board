@@ -189,6 +189,10 @@
 								/>
 							</a>
 						</div>
+						<!-- Num. Posts by User -->
+						<div class="mt-2 text-sm text-gray-600">
+							Posts: {post.authorPostCount}
+						</div>
 					</div>
 
 					<!-- Content -->

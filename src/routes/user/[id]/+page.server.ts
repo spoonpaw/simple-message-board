@@ -43,6 +43,9 @@ export async function load(requestEvent: RequestEvent) {
 			username: userProfile.username,
 			email: userProfile.email,
 			profileImageUrl: userProfile.profile_image_url,
+			bio: userProfile.bio,
+			createdAt: userProfile.created_at,
+			lastLogin: userProfile.last_login,
 			isOwnProfile
 			// other user details...
 		},

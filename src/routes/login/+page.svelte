@@ -36,9 +36,7 @@
 	<title>Simple Message Board - Login</title>
 </svelte:head>
 
-<div
-	class="min-h-screen bg-gray-100 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8"
->
+<div class="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
 	{#if $errorMessage}
 		<p class="text-red-500 mb-4">{$errorMessage}</p>
 	{/if}
