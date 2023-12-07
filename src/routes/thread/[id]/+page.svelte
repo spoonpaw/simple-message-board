@@ -119,7 +119,7 @@
 </svelte:head>
 
 <div class="min-h-screen bg-gray-50">
-	<div class="container mx-auto py-8 px-4 sm:px-0">
+	<div class="container mx-auto pt-8 px-4 sm:px-0">
 		<div class="flex justify-between items-center mb-6">
 			<div>
 				<button
@@ -143,6 +143,16 @@
 
 			<UserStatusHeader {isLoggedIn} {username} userId={userid ?? ''} />
 		</div>
+
+		{#if !thread.locked && isLoggedIn}
+			<div class="flex justify-end">
+				<button
+					class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+					on:click={toggleNewPostModal}
+					>Add Reply
+				</button>
+			</div>
+		{/if}
 
 		<!-- Thread Content and Posts -->
 		<div class="mb-4">
@@ -179,6 +189,10 @@
 								{post.authorUsername}
 							</a>
 						</div>
+						<!-- Role Name -->
+						<div class="text-xs text-gray-500 mt-1">
+							{post.authorRoleName}
+						</div>
 						<!-- Profile Image -->
 						<div class="w-20 h-20 rounded-full mt-1">
 							<a href={`/user/${post.authorId}`}>
@@ -196,7 +210,7 @@
 					</div>
 
 					<!-- Content -->
-					<div class="ml-10">
+					<div class="ml-5 mr-5">
 						<p>{post.content}</p>
 					</div>
 					<!-- Additional Details -->
@@ -216,61 +230,55 @@
 	</div>
 
 	{#if !thread.locked && isLoggedIn}
-		<button
-			class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
-			on:click={toggleNewPostModal}
-			>Add Reply
-		</button>
+		<!-- New Post Modal -->
+		<Modal open={newPostModal} title="Add a Reply" on:close={toggleNewPostModal}>
+			<div slot="body">
+				<form on:submit={submitNewPost}>
+					<textarea name="content" class="w-full p-2 border rounded" required></textarea>
+					<div class="px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+						<button
+							type="submit"
+							class="w-full inline-flex justify-center rounded-md bg-blue-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
+						>
+							Submit
+						</button>
+						<button
+							type="button"
+							class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+							on:click={toggleNewPostModal}
+							>Cancel
+						</button>
+					</div>
+				</form>
+			</div>
+		</Modal>
+
+		<!-- Edit Post Modal -->
+		<Modal open={editPostModal} title="Edit Post" on:close={toggleEditPostModal}>
+			<div slot="body">
+				<form on:submit={submitEditedPost}>
+					<textarea
+						bind:value={currentPostContent}
+						name="content"
+						class="w-full p-2 border rounded"
+						required
+					></textarea>
+					<div class="px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+						<button
+							type="submit"
+							class="w-full inline-flex justify-center rounded-md bg-blue-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
+						>
+							Save Changes
+						</button>
+						<button
+							type="button"
+							class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+							on:click={toggleEditPostModal}
+							>Cancel
+						</button>
+					</div>
+				</form>
+			</div>
+		</Modal>
 	{/if}
-
-	<!-- New Post Modal -->
-	<Modal open={newPostModal} title="Add a Reply" on:close={toggleNewPostModal}>
-		<div slot="body">
-			<form on:submit={submitNewPost}>
-				<textarea name="content" class="w-full p-2 border rounded" required></textarea>
-				<div class="px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-					<button
-						type="submit"
-						class="w-full inline-flex justify-center rounded-md bg-blue-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
-					>
-						Submit
-					</button>
-					<button
-						type="button"
-						class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-						on:click={toggleNewPostModal}
-						>Cancel
-					</button>
-				</div>
-			</form>
-		</div>
-	</Modal>
-
-	<!-- Edit Post Modal -->
-	<Modal open={editPostModal} title="Edit Post" on:close={toggleEditPostModal}>
-		<div slot="body">
-			<form on:submit={submitEditedPost}>
-				<textarea
-					bind:value={currentPostContent}
-					name="content"
-					class="w-full p-2 border rounded"
-					required
-				></textarea>
-				<div class="px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-					<button
-						type="submit"
-						class="w-full inline-flex justify-center rounded-md bg-blue-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
-					>
-						Save Changes
-					</button>
-					<button
-						type="button"
-						class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-						on:click={toggleEditPostModal}
-						>Cancel
-					</button>
-				</div>
-			</form>
-		</div>
-	</Modal>
 </div>

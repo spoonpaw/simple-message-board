@@ -11,9 +11,11 @@ export async function getPostsByThreadId(threadId: string) {
                    u.username as author_username,
                    u.id as author_id,
                    u.profile_image_url as author_profile_image_url,
+                   r.name as author_role_name,  -- Include the role name
                    pc.post_count as author_post_count
             FROM posts p
             JOIN users u ON p.user_id = u.id
+            LEFT JOIN roles r ON u.role_id = r.id  -- Join with roles table
             LEFT JOIN (
                 SELECT user_id, COUNT(*) as post_count
                 FROM posts
@@ -31,6 +33,7 @@ export async function getPostsByThreadId(threadId: string) {
 			authorUsername: row.author_username,
 			authorId: row.author_id,
 			authorProfileImageUrl: row.author_profile_image_url,
+			authorRoleName: row.author_role_name, // Map the role name
 			authorPostCount: row.author_post_count,
 			createdAt: row.created_at,
 			updatedAt: row.updated_at

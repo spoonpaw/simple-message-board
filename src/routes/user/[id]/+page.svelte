@@ -255,11 +255,11 @@
 					on:change={validateAvatarFile}
 					bind:this={avatarFileInput}
 					class="block w-full text-sm text-gray-500
-                              file:mr-4 file:py-2 file:px-4
-                              file:rounded-full file:border-0
-                              file:text-sm file:font-semibold
-                              file:bg-blue-50 file:text-blue-700
-                              hover:file:bg-blue-100"
+                          file:mr-4 file:py-2 file:px-4
+                          file:rounded-full file:border-0
+                          file:text-sm file:font-semibold
+                          file:bg-blue-50 file:text-blue-700
+                          hover:file:bg-blue-100"
 				/>
 
 				{#if avatarPreviewImageUrl}
@@ -273,8 +273,17 @@
 					<p class="text-red-500 text-sm">{invalidAvatarFileMessage}</p>
 				{/if}
 
-				<!-- Wrapping the button in a div with padding-top for better spacing -->
-				<div class="pt-4">
+				<!-- Button Container -->
+				<div class="flex justify-end space-x-4 pt-4">
+					<!-- Cancel Button -->
+					<button
+						type="button"
+						class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-700 transition duration-300"
+						on:click={handleAvatarModalClose}
+					>
+						Cancel
+					</button>
+					<!-- Upload Image Button -->
 					<button
 						type="submit"
 						class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition duration-300"
@@ -294,7 +303,16 @@
 				{#if bioWarningMessage}
 					<p class="text-red-500 text-sm">{bioWarningMessage}</p>
 				{/if}
-				<div class="pt-4">
+				<div class="flex justify-end space-x-4 pt-4">
+					<!-- Cancel Button -->
+					<button
+						type="button"
+						class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-700 transition duration-300"
+						on:click={handleBioModalClose}
+					>
+						Cancel
+					</button>
+					<!-- Save Changes Button -->
 					<button
 						type="submit"
 						class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition duration-300"

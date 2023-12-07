@@ -5,9 +5,9 @@ export type ThreadCategoryView = {
 	title: string;
 	pinned: boolean;
 	locked: boolean;
-	createdAt: Date;
+	createdAt: string;
 	creatorUsername: string;
 	replyCount: number;
 	lastReplierUsername: string | null;
-	lastReplyAt: Date | null;
+	lastReplyAt: string | null;
 };

@@ -5,11 +5,29 @@ export interface User {
 	username: string;
 	email: string;
 	password_hash: string;
+	role_id: string; // Non-nullable role ID
 	created_at: Date;
 	last_login: Date | null;
 	confirmation_token: string;
 	is_confirmed: boolean;
 	profile_image_url: string;
+	bio?: string; // Optional bio field
+}
+
+export interface Role {
+	id: string;
+	name: string;
+}
+
+export interface Permission {
+	id: string;
+	name: string;
+	description: string;
+}
+
+export interface RolePermission {
+	role_id: string;
+	permission_id: string;
 }
 
 export interface Category {

@@ -22,6 +22,7 @@ export interface PostView {
 	authorId: string;
 	authorProfileImageUrl: string;
 	authorPostCount: number;
+	authorRoleName: string;
 }
 
 export interface PageServerData {
