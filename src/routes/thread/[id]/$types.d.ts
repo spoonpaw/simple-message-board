@@ -14,15 +14,18 @@ export interface ThreadView {
 }
 
 export interface PostView {
-	id: string;
+	authorId: string;
+	authorPostCount: number;
+	authorProfileImageUrl: string;
+	authorRoleName: string;
+	authorUsername: string;
 	content: string;
 	createdAt: string;
+	deleted: boolean;
+	deletedAt: string | null;
+	id: string;
 	updatedAt: string;
-	authorUsername: string;
-	authorId: string;
-	authorProfileImageUrl: string;
-	authorPostCount: number;
-	authorRoleName: string;
+	originatingPost: boolean;
 }
 
 export interface PageServerData {

@@ -55,4 +55,5 @@ export interface Post {
 	quoted_post_id: string | null;
 	created_at: Date;
 	updated_at: Date | null;
+	deleted: boolean;
 }

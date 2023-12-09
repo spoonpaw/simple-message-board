@@ -181,7 +181,7 @@
 <style>
 	/* Style for the Quill editor container */
 	:global(.ql-container) {
-		max-height: 300px; /* Adjust the max-height as needed */
+		max-height: 280px; /* Adjust the max-height as needed */
 		overflow-y: auto; /* Enables vertical scrolling */
 		border-radius: 0.25rem; /* Add rounded corners */
 	}

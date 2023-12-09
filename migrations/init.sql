@@ -66,7 +66,9 @@ CREATE TABLE posts (
     content TEXT NOT NULL,
     quoted_post_id UUID REFERENCES posts(id) ON DELETE SET NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE
+    updated_at TIMESTAMP WITH TIME ZONE,
+    deleted BOOLEAN DEFAULT FALSE,
+    deleted_at TIMESTAMP WITH TIME ZONE
 );
 
 -- Insert default roles
