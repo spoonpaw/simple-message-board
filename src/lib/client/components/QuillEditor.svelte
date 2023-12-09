@@ -47,7 +47,7 @@
 					}
 				}
 			},
-			scrollingContainer: quillContainer
+			scrollingContainer: quillContainer,
 		});
 
 		if (initialContent) {
@@ -189,4 +189,13 @@
 	:global(.ql-toolbar) {
 		border-radius: 0.25rem;
 	}
+
+	:global(.ql-tooltip) {
+		left: unset !important;
+	}
+
+	:global(.ql-editor) {
+		min-height: 200px;
+	}
+
 </style>

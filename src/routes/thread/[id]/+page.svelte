@@ -255,9 +255,8 @@
 
                     <!-- Content -->
                     <div class="ml-5 mr-5">
-                        <div class="post-content">
-                            {@html post.content}
-                            <!-- eslint-disable-line svelte/no-at-html-tags -->
+                        <div>
+                            {@html post.content} <!-- eslint-disable-line svelte/no-at-html-tags -->
                         </div>
                     </div>
 
