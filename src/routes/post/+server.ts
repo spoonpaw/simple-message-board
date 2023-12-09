@@ -4,21 +4,31 @@ import type { RequestEvent } from '@sveltejs/kit';
 import { validateUser } from '$lib/server/auth';
 import { getPostsByThreadId, pool } from '$lib/server';
 import { error, json } from '@sveltejs/kit';
+import sanitizeHtml from 'sanitize-html';
 
 export async function POST(requestEvent: RequestEvent) {
-	const { request } = requestEvent;
 	const authenticatedUser = await validateUser(requestEvent);
 	if (!authenticatedUser) {
 		return error(401, 'Unauthorized');
 	}
 
-	const formData = await request.formData();
-	const threadId = formData.get('threadId');
-	const content = formData.get('content');
+	// Parse JSON data from the request body
+	const requestData = await requestEvent.request.json();
+	const { threadId, content } = requestData;
 
-	if (typeof threadId !== 'string' || typeof content !== 'string' || !content.trim()) {
+	if (!threadId || typeof content !== 'string' || !content.trim()) {
 		return error(400, 'Thread ID and content are required');
 	}
+
+	// Sanitize the content
+	const sanitizedContent = sanitizeHtml(content, {
+		allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
+		allowedAttributes: {
+			...sanitizeHtml.defaults.allowedAttributes,
+			img: ['src', 'alt', 'title', 'width', 'height']
+		},
+		allowedSchemes: ['http', 'https', 'ftp', 'mailto', 'tel']
+	});
 
 	const client = await pool.connect();
 	try {
@@ -31,11 +41,11 @@ export async function POST(requestEvent: RequestEvent) {
 			return error(403, 'Thread is locked');
 		}
 
-		// Insert the new post
+		// Insert the new post with sanitized content
 		await client.query('INSERT INTO posts (thread_id, user_id, content) VALUES ($1, $2, $3)', [
 			threadId,
 			authenticatedUser.id,
-			content
+			sanitizedContent
 		]);
 
 		// Fetch updated posts after the insertion

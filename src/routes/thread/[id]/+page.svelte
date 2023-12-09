@@ -7,11 +7,25 @@
 	import { ArrowLeftCircle, Lock, Pencil, Pin, Trash } from '@steeze-ui/lucide-icons';
 	import Modal from '$lib/client/components/Modal.svelte';
 	import UserStatusHeader from '$lib/client/components/UserStatusHeader.svelte';
+	import QuillEditor from '$lib/client/components/QuillEditor.svelte';
 
-	let newPostModal = false; // Modal for submitting a new post
 	let editPostModal = false; // Modal for modifying an existing post
 	let editedPostId: string | null = null; // Track the ID of the post being edited
 	let currentPostContent = ''; // Variable to hold the content of the post being edited
+	let editPostQuillEditor: QuillEditor;
+
+	// Variables for the new post Quill editor
+	let newPostModal = false; // Modal for submitting a new post
+	let newPostQuillEditor: QuillEditor;
+	let newPostContent = '';
+
+	function handleNewPostTextChange(event: CustomEvent) {
+		newPostContent = event.detail.content;
+	}
+
+	function handleEditedPostTextChange(event: CustomEvent) {
+		currentPostContent = event.detail.content;
+	}
 
 	export let data: PageServerData;
 	let { username, userid, thread } = data;
@@ -32,18 +46,26 @@
 
 	async function submitNewPost(event: SubmitEvent) {
 		event.preventDefault();
-		const formData = new FormData(event.target as HTMLFormElement);
-		formData.append('threadId', thread.id); // Append thread ID to form data
+
+		// Use content from Quill editor instead of FormData
+		const postData = {
+			content: newPostContent,
+			threadId: thread.id
+		};
 
 		try {
 			const response = await fetch(`/post`, {
 				method: 'POST',
-				body: formData
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(postData)
 			});
 
 			if (response.ok) {
-				thread.posts = await response.json(); // Update posts with new data
+				thread.posts = await response.json();
 				toggleNewPostModal();
+				newPostContent = ''; // Reset the editor content
 			} else {
 				console.error('Failed to submit new post.');
 			}
@@ -65,8 +87,8 @@
 			return;
 		}
 
-		const formData = new FormData(event.target as HTMLFormElement);
-		const content = formData.get('content'); // Assuming 'content' is the name of your textarea
+		// Use the content from the Quill editor for the edited post
+		const editedContent = currentPostContent;
 
 		try {
 			const response = await fetch(`/post/${editedPostId}`, {
@@ -75,7 +97,7 @@
 					'Content-Type': 'application/json'
 				},
 				body: JSON.stringify({
-					content,
+					content: editedContent,
 					threadId: thread.id // Include the thread ID in the request
 				})
 			});
@@ -83,6 +105,7 @@
 			if (response.ok) {
 				thread.posts = await response.json(); // Update posts with new data
 				editedPostId = null; // Reset edited post ID
+				currentPostContent = ''; // Reset the Quill editor content
 				toggleEditPostModal();
 			} else {
 				const errorResponse = await response.text();
@@ -126,7 +149,7 @@
 					on:click={navigateToCategory}
 					class="text-blue-500 hover:text-blue-700 font-bold flex items-center"
 				>
-					<Icon src={ArrowLeftCircle} class="w-5 h-5 mr-1 align-text-bottom" />
+					<Icon src={ArrowLeftCircle} class="w-5 h-5 flex-shrink-0 mr-1 align-text-bottom" />
 					Back to Category: {thread.category_title}
 				</button>
 
@@ -211,8 +234,12 @@
 
 					<!-- Content -->
 					<div class="ml-5 mr-5">
-						<p>{post.content}</p>
+						<div class="post-content">
+							{@html post.content}
+							<!-- eslint-disable-line svelte/no-at-html-tags -->
+						</div>
 					</div>
+
 					<!-- Additional Details -->
 					<div class="flex flex-col justify-end ml-auto text-sm text-gray-500">
 						<p>
@@ -234,7 +261,12 @@
 		<Modal open={newPostModal} title="Add a Reply" on:close={toggleNewPostModal}>
 			<div slot="body">
 				<form on:submit={submitNewPost}>
-					<textarea name="content" class="w-full p-2 border rounded" required></textarea>
+					<QuillEditor
+						bind:this={newPostQuillEditor}
+						initialContent={newPostContent}
+						on:textChange={handleNewPostTextChange}
+					/>
+
 					<div class="px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
 						<button
 							type="submit"
@@ -257,12 +289,12 @@
 		<Modal open={editPostModal} title="Edit Post" on:close={toggleEditPostModal}>
 			<div slot="body">
 				<form on:submit={submitEditedPost}>
-					<textarea
-						bind:value={currentPostContent}
-						name="content"
-						class="w-full p-2 border rounded"
-						required
-					></textarea>
+					<QuillEditor
+						bind:this={editPostQuillEditor}
+						initialContent={currentPostContent}
+						on:textChange={handleEditedPostTextChange}
+					/>
+
 					<div class="px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
 						<button
 							type="submit"

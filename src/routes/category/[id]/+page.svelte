@@ -8,6 +8,7 @@
 	import UserStatusHeader from '$lib/client/components/UserStatusHeader.svelte';
 	import Modal from '$lib/client/components/Modal.svelte';
 	import type { ThreadCategoryView } from '$lib/shared';
+	import QuillEditor from '$lib/client/components/QuillEditor.svelte';
 
 	export let data: PageServerData;
 	const { username, userid, category } = data;
@@ -16,6 +17,11 @@
 	let newThreadModal = false; // Modal for creating a new thread
 	let newThreadTitle = '';
 	let newThreadContent = '';
+	let newThreadQuillEditor: QuillEditor; // Variable for Quill editor instance
+
+	function handleNewThreadTextChange(event: CustomEvent) {
+		newThreadContent = event.detail.content;
+	}
 
 	function toggleNewThreadModal() {
 		newThreadModal = !newThreadModal;
@@ -49,23 +55,25 @@
 	async function submitNewThread(event: SubmitEvent) {
 		event.preventDefault();
 
-		// Prepare the form data for the POST request
-		const formData = new FormData();
-		formData.append('title', newThreadTitle);
-		formData.append('content', newThreadContent);
-		formData.append('categoryId', category.id);
+		const postData = {
+			title: newThreadTitle,
+			content: newThreadContent,
+			categoryId: category.id
+		};
 
 		try {
 			const response = await fetch('/thread', {
 				method: 'POST',
-				body: formData
+				headers: {
+					'Content-Type': 'application/json' // Specify the content type as JSON
+				},
+				body: JSON.stringify(postData) // Send the postData object as a JSON string
 			});
 
 			const responseData = await response.json();
 
 			if (response.ok) {
 				// Update the threads data with the response from the server
-
 				threads = sortThreads(responseData);
 				// Reset form fields and close the modal
 				newThreadTitle = '';
@@ -97,7 +105,7 @@
 					on:click={navigateToBoard}
 					class="text-blue-500 hover:text-blue-700 font-bold flex items-center"
 				>
-					<Icon src={ArrowLeftCircle} class="w-5 h-5 mr-1 align-text-bottom" />
+					<Icon src={ArrowLeftCircle} class="w-5 h-5 mr-1 align-text-bottom flex-shrink-0" />
 					Back to Main Board
 				</button>
 
@@ -160,16 +168,15 @@
 				<input
 					type="text"
 					bind:value={newThreadTitle}
-					class="w-full p-2 border rounded"
+					class="w-full p-2 border rounded mb-2"
 					placeholder="Thread Title"
 					required
 				/>
-				<textarea
-					bind:value={newThreadContent}
-					class="w-full p-2 border rounded mt-2"
-					placeholder="Your Message"
-					required
-				></textarea>
+				<QuillEditor
+					bind:this={newThreadQuillEditor}
+					initialContent={newThreadContent}
+					on:textChange={handleNewThreadTextChange}
+				/>
 				<div class="flex justify-end mt-4 space-x-2">
 					<button
 						type="button"

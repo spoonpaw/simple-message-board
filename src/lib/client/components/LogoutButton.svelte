@@ -15,5 +15,5 @@
 </script>
 
 <button on:click={logout} class="focus:outline-none hover:bg-blue-100 p-1 rounded" title="Logout">
-	<Icon src={LogOut} class="w-4 h-4 text-blue-500" />
+	<Icon src={LogOut} class="w-4 h-4 text-blue-500 flex-shrink-0" />
 </button>

@@ -4,14 +4,12 @@ import type { RequestEvent } from '@sveltejs/kit';
 import { validateUser } from '$lib/server/auth';
 import { getPostsByThreadId, pool } from '$lib/server';
 import { error, json } from '@sveltejs/kit';
+import sanitizeHtml from 'sanitize-html';
 
 export async function PUT(requestEvent: RequestEvent) {
 	const { params, request } = requestEvent;
-	console.log('PUT request received for post ID:', params.id);
-
 	const authenticatedUser = await validateUser(requestEvent);
 	if (!authenticatedUser) {
-		console.error('Unauthorized request');
 		return error(401, 'Unauthorized');
 	}
 
@@ -19,14 +17,22 @@ export async function PUT(requestEvent: RequestEvent) {
 
 	try {
 		const requestData = await request.json();
-		console.log('Request Data:', requestData);
-
 		const threadId = requestData.threadId;
-		const content = requestData.content; // Retrieve the updated content from the request body
+		let content = requestData.content;
+
+		// Sanitize the content
+		content = sanitizeHtml(content, {
+			allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
+			allowedAttributes: {
+				...sanitizeHtml.defaults.allowedAttributes,
+				img: ['src', 'alt', 'title', 'width', 'height']
+			},
+			allowedSchemes: ['http', 'https', 'ftp', 'mailto', 'tel']
+		});
 
 		const client = await pool.connect();
 		try {
-			// Similar check for thread locked status
+			// Check if the thread is locked
 			const threadResult = await client.query('SELECT locked FROM threads WHERE id = $1', [
 				threadId
 			]);
@@ -37,7 +43,7 @@ export async function PUT(requestEvent: RequestEvent) {
 				return error(403, 'Thread is locked');
 			}
 
-			// Update the post, including the updated_at field
+			// Update the post with sanitized content
 			const updateResult = await client.query(
 				'UPDATE posts SET content = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 AND user_id = $3 RETURNING *',
 				[content, postId, authenticatedUser.id]
@@ -59,8 +65,8 @@ export async function PUT(requestEvent: RequestEvent) {
 			client.release();
 		}
 	} catch (err) {
-		console.error('Error parsing request JSON:', err);
-		return error(400, 'Bad Request: Invalid JSON');
+		console.error('Error processing PUT request:', err);
+		return error(500, 'Server Error');
 	}
 }
 

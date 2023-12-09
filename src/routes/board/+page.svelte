@@ -31,7 +31,7 @@
 					on:click={navigateToHome}
 					class="text-blue-500 hover:text-blue-700 font-bold flex items-center"
 				>
-					<Icon src={Home} class="w-5 h-5 mr-1 align-text-bottom" />
+					<Icon src={Home} class="w-5 h-5 flex-shrink-0 mr-1 align-text-bottom" />
 					Home
 				</button>
 

@@ -78,9 +78,9 @@
 		}
 
 		// Validate file size
-		const maxFileSize = 100 * 1024; // 100KB in bytes
+		const maxFileSize = 500 * 1024; // 500KB in bytes
 		if (file.size > maxFileSize) {
-			invalidAvatarFileMessage = 'File is too large. Maximum size is 100KB.';
+			invalidAvatarFileMessage = 'File is too large. Maximum size is 500KB.';
 			input.value = ''; // Reset the input
 			return;
 		}
@@ -158,7 +158,7 @@
 				on:click={navigateBack}
 				class="text-blue-500 hover:text-blue-700 font-bold flex items-center"
 			>
-				<Icon src={ArrowLeftCircle} class="w-5 h-5 mr-1 align-text-bottom" />
+				<Icon src={ArrowLeftCircle} class="w-5 h-5 mr-1 align-text-bottom flex-shrink-0" />
 				Back
 			</button>
 			<UserStatusHeader
