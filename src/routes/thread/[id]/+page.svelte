@@ -358,6 +358,7 @@
                             // eslint-disable-next-line
                             {@html renderQuotedPost(post.quotedPost)}
                         {/if}
+                        // eslint-disable-next-line
                         <div>{@html post.content}</div>
                     </div>
 
