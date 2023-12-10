@@ -5,6 +5,7 @@ import { validateUser } from '$lib/server/auth';
 import { getPostsByThreadId, pool } from '$lib/server';
 import { error, json } from '@sveltejs/kit';
 import sanitizeHtml from 'sanitize-html';
+import { getTextFromHtml } from '$lib/shared/htmlUtils/getTextFromHtml';
 
 export async function POST(requestEvent: RequestEvent) {
 	const authenticatedUser = await validateUser(requestEvent);
@@ -18,6 +19,11 @@ export async function POST(requestEvent: RequestEvent) {
 
 	if (!threadId || typeof content !== 'string' || !content.trim()) {
 		return error(400, 'Thread ID and content are required');
+	}
+
+	const textContent = getTextFromHtml(content);
+	if (textContent.length > 8000) {
+		return error(400, 'Content exceeds 8000 characters.');
 	}
 
 	// Sanitize the content

@@ -5,6 +5,7 @@ import { validateUser } from '$lib/server/auth';
 import { getPostsByThreadId, pool } from '$lib/server';
 import { error, json } from '@sveltejs/kit';
 import sanitizeHtml from 'sanitize-html';
+import { getTextFromHtml } from '$lib/shared/htmlUtils/getTextFromHtml';
 
 export async function PUT(requestEvent: RequestEvent) {
 	const { params, request } = requestEvent;
@@ -17,12 +18,13 @@ export async function PUT(requestEvent: RequestEvent) {
 
 	try {
 		const requestData = await request.json();
-		const threadId = requestData.threadId;
-		let content = requestData.content;
-		const newTitle = requestData?.title; // Using optional chaining
+		const { threadId, content, title } = requestData;
 
-		// Sanitize the content
-		content = sanitizeHtml(content, {
+		if (getTextFromHtml(content).length > 8000) {
+			return error(400, 'Content exceeds 8000 characters.');
+		}
+
+		const sanitizedContent = sanitizeHtml(content, {
 			allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
 			allowedAttributes: {
 				...sanitizeHtml.defaults.allowedAttributes,
@@ -33,55 +35,55 @@ export async function PUT(requestEvent: RequestEvent) {
 
 		const client = await pool.connect();
 		try {
-			// Check if the thread is locked
+			await client.query('BEGIN'); // Start transaction
+
 			const threadResult = await client.query('SELECT locked FROM threads WHERE id = $1', [
 				threadId
 			]);
 			if (threadResult.rows.length === 0) {
+				await client.query('ROLLBACK'); // Rollback transaction
 				return error(404, 'Thread not found');
 			}
 			if (threadResult.rows[0].locked) {
+				await client.query('ROLLBACK'); // Rollback transaction
 				return error(403, 'Thread is locked');
 			}
 
-			// Update the post with sanitized content
 			const updateResult = await client.query(
 				'UPDATE posts SET content = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 AND user_id = $3 RETURNING *',
-				[content, postId, authenticatedUser.id]
+				[sanitizedContent, postId, authenticatedUser.id]
 			);
 
-			// Check if the post was actually updated
 			if (updateResult.rowCount === 0) {
+				await client.query('ROLLBACK'); // Rollback transaction
 				return error(404, 'Post not found or user is not the creator of the post');
 			}
 
-			// Check if the post is the originating post
 			const originatingPostQuery = await client.query(
 				'SELECT id FROM posts WHERE thread_id = $1 ORDER BY created_at ASC LIMIT 1',
 				[threadId]
 			);
 			const isOriginatingPost = originatingPostQuery.rows[0].id === postId;
-			let updatedThreadTitle: string | null = null;
 
-			// Update the thread title if the post is the originating post
-			if (isOriginatingPost && newTitle) {
-				await client.query('UPDATE threads SET title = $1 WHERE id = $2', [newTitle, threadId]);
-				updatedThreadTitle = newTitle;
+			if (isOriginatingPost && title) {
+				if (title.length > 60) {
+					await client.query('ROLLBACK'); // Rollback transaction
+					return error(400, 'Title exceeds 60 characters.');
+				}
+				await client.query('UPDATE threads SET title = $1 WHERE id = $2', [title, threadId]);
 			}
 
-			// Fetch updated posts after the edit
+			await client.query('COMMIT'); // Commit transaction
+
 			const updatedPosts = await getPostsByThreadId(threadId);
-
-			// Prepare and return the response
-			const response: { posts: typeof updatedPosts; updatedThreadTitle?: string } = {
-				posts: updatedPosts
+			const response = {
+				posts: updatedPosts,
+				updatedThreadTitle: isOriginatingPost && title ? title : null
 			};
-			if (updatedThreadTitle !== null) {
-				response.updatedThreadTitle = updatedThreadTitle;
-			}
 
 			return json(response);
 		} catch (err) {
+			await client.query('ROLLBACK'); // Rollback transaction
 			console.error('Error processing PUT request:', err);
 			return error(500, 'Server Error');
 		} finally {

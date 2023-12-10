@@ -47,7 +47,7 @@
 					}
 				}
 			},
-			scrollingContainer: quillContainer,
+			scrollingContainer: quillContainer
 		});
 
 		if (initialContent) {
@@ -174,7 +174,7 @@
 		in:fade={{ duration: 300 }}
 		out:fade={{ duration: 300 }}
 	>
-		<span class="block sm:inline">{errorMessage}</span>
+		<span class="block sm:inline text-sm">{errorMessage}</span>
 	</div>
 {/if}
 
@@ -197,5 +197,4 @@
 	:global(.ql-editor) {
 		min-height: 200px;
 	}
-
 </style>

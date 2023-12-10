@@ -11,7 +11,7 @@
 	export let userId: string;
 </script>
 
-<div class="flex space-x-4">
+<div class="flex space-x-4 ml-2">
 	<div class="text-lg text-gray-600">Hi {username}!</div>
 	{#if isLoggedIn}
 		<UserProfileButton {userId} />

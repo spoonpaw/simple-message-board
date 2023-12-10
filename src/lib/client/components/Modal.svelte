@@ -6,7 +6,7 @@
 	const dispatch = createEventDispatcher();
 
 	function handleKeydown(event: KeyboardEvent) {
-		if (event.key === 'Escape') {
+		if (event.key === 'Escape' && open) {
 			dispatch('close');
 		}
 	}
@@ -40,7 +40,7 @@
 		<div
 			class="bg-white w-full lg:h-max lg:w-1/2 mx-auto rounded-lg shadow-xl z-50 overflow-y-auto"
 		>
-			<div class="flex justify-between items-center head py-5 px-8 text-2xl font-extrabold">
+			<div class="flex justify-between items-center head pt-5 px-8 text-2xl font-extrabold">
 				{title}
 			</div>
 			<div class="content p-8">

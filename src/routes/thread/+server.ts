@@ -5,6 +5,7 @@ import { validateUser } from '$lib/server/auth';
 import { getThreadsByCategoryId, pool } from '$lib/server';
 import { error, json } from '@sveltejs/kit';
 import sanitizeHtml from 'sanitize-html';
+import { getTextFromHtml } from '$lib/shared/htmlUtils/getTextFromHtml';
 
 export async function POST(requestEvent: RequestEvent) {
 	const authenticatedUser = await validateUser(requestEvent);
@@ -22,6 +23,16 @@ export async function POST(requestEvent: RequestEvent) {
 			typeof categoryId !== 'string'
 		) {
 			return error(400, 'Title, content, and category ID are required');
+		}
+
+		// Validate title and content lengths
+		if (title.length > 60) {
+			return error(400, 'Title exceeds 60 characters.');
+		}
+
+		const textContent = getTextFromHtml(content);
+		if (textContent.length > 8000) {
+			return error(400, 'Content exceeds 8000 characters.');
 		}
 
 		// Sanitize the content
