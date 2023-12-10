@@ -355,6 +355,7 @@
                     <div class="ml-5 mr-5 mt-4">
                         {#if post.quotedPost}
                             <!-- Display quoted post content -->
+                            // eslint-disable-next-line
                             {@html renderQuotedPost(post.quotedPost)}
                         {/if}
                         <div>{@html post.content}</div>
