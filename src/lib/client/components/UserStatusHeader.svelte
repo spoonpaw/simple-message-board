@@ -1,7 +1,6 @@
 <!-- src/lib/client/components/UserStatusHeader.svelte -->
 
 <script lang="ts">
-	// Define the prop types
 	import UserProfileButton from '$lib/client/components/UserProfileButton.svelte';
 	import { LogoutButton } from '$lib/client';
 	import LoginButton from '$lib/client/components/LoginButton.svelte';
@@ -14,9 +13,15 @@
 <div class="flex space-x-4 ml-2">
 	<div class="text-lg text-gray-600">Hi {username}!</div>
 	{#if isLoggedIn}
+		<div>
 		<UserProfileButton {userId} />
+		</div>
+		<div>
 		<LogoutButton />
+		</div>
 	{:else}
+		<div>
 		<LoginButton />
+		</div>
 	{/if}
 </div>

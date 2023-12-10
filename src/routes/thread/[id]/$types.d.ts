@@ -24,8 +24,10 @@ export interface PostView {
 	deleted: boolean;
 	deletedAt: string | null;
 	id: string;
-	updatedAt: string;
 	originatingPost: boolean;
+	quotedPost?: PostView | null;
+	quotedPostId: string | null;
+	updatedAt: string;
 }
 
 export interface PageServerData {

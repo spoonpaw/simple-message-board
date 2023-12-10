@@ -1,11 +1,11 @@
 // src/routes/post/+server.ts
 
-import type { RequestEvent } from '@sveltejs/kit';
-import { validateUser } from '$lib/server/auth';
-import { getPostsByThreadId, pool } from '$lib/server';
-import { error, json } from '@sveltejs/kit';
+import type {RequestEvent} from '@sveltejs/kit';
+import {validateUser} from '$lib/server/auth';
+import {getPostsByThreadId, pool} from '$lib/server';
+import {error, json} from '@sveltejs/kit';
 import sanitizeHtml from 'sanitize-html';
-import { getTextFromHtml } from '$lib/shared/htmlUtils/getTextFromHtml';
+import {getTextFromHtml} from '$lib/shared/htmlUtils/getTextFromHtml';
 
 export async function POST(requestEvent: RequestEvent) {
 	const authenticatedUser = await validateUser(requestEvent);
@@ -15,7 +15,7 @@ export async function POST(requestEvent: RequestEvent) {
 
 	// Parse JSON data from the request body
 	const requestData = await requestEvent.request.json();
-	const { threadId, content } = requestData;
+	const {threadId, content, quotedPostId} = requestData;
 
 	if (!threadId || typeof content !== 'string' || !content.trim()) {
 		return error(400, 'Thread ID and content are required');
@@ -47,12 +47,17 @@ export async function POST(requestEvent: RequestEvent) {
 			return error(403, 'Thread is locked');
 		}
 
-		// Insert the new post with sanitized content
-		await client.query('INSERT INTO posts (thread_id, user_id, content) VALUES ($1, $2, $3)', [
+		const insertQuery = `
+            INSERT INTO posts (thread_id, user_id, content, quoted_post_id)
+            VALUES ($1, $2, $3, $4)
+            RETURNING id`;
+		const params = [
 			threadId,
 			authenticatedUser.id,
-			sanitizedContent
-		]);
+			sanitizedContent,
+			quotedPostId || null  // Handle null or undefined values
+		];
+		const postResult = await client.query(insertQuery, params);
 
 		// Fetch updated posts after the insertion
 		const updatedPosts = await getPostsByThreadId(threadId);
