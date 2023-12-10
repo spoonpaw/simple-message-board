@@ -9,6 +9,8 @@
 	import UserStatusHeader from '$lib/client/components/UserStatusHeader.svelte';
 	import QuillEditor from '$lib/client/components/QuillEditor.svelte';
 	import {getTextFromHtml} from '$lib/shared/htmlUtils/getTextFromHtml';
+	import { parse, HTMLElement } from 'node-html-parser';
+
 
 	let editPostModal = false; // Modal for modifying an existing post
 	let editedPostId: string | null = null; // Track the ID of the post being edited
@@ -202,20 +204,18 @@
 
 	function renderQuotedPost(quotedPost: PostView): string {
 		// Parse the content as HTML
-		const parser = new DOMParser();
-		const doc = parser.parseFromString(quotedPost.content, 'text/html');
+		const root = parse(quotedPost.content);
 
 		// Modify all img tags to have a max height and width
-		doc.querySelectorAll('img').forEach(img => {
-			img.style.maxHeight = '100px'; // Set the max height
-			img.style.maxWidth = '100px';  // Set the max width
+		root.querySelectorAll('img').forEach((img: HTMLElement) => {
+			img.setAttribute('style', 'max-height: 100px; max-width: 100px;');
 		});
 
 		// Serialize the modified HTML back to a string
-		const serializedContent = new XMLSerializer().serializeToString(doc.body);
+		const serializedContent = root.toString();
 
 		return `
-        <div class="bg-gray-100 p-2 border-l-4 border-blue-500 mb-2">
+        <div class="bg-gray-100 p-2 border-l-4 border-blue-500 mb-2 w-auto">
             <div class="text-sm font-medium">
                 <a href="/user/${quotedPost.authorId}" class="text-blue-600 hover:text-blue-800 hover:underline">@${quotedPost.authorUsername}</a>
             </div>
@@ -350,18 +350,16 @@
                             {/if}
                         </div>
                     </div>
-
-                    <!-- Content and Quoted Posts -->
-                    <div class="ml-5 mr-5 mt-4">
+                    <!-- Content and Quoted Posts with responsive design -->
+                    <div class="overflow-auto ml-5 mr-5 mt-4 w-auto">
                         {#if post.quotedPost}
-                            <!-- Display quoted post content -->
-                            // eslint-disable-next-line
-                            {@html renderQuotedPost(post.quotedPost)} // eslint-disable-line
+                            <!-- Display quoted post content in a container that adjusts to content -->
+                            <div class="w-auto overflow-x-auto bg-gray-100 p-2 border-l-4 border-blue-500">
+                                {@html renderQuotedPost(post.quotedPost)}
+                            </div>
                         {/if}
-                        // eslint-disable-next-line
-                        <div>{@html post.content}</div> // eslint-disable-line
+                        <div>{@html post.content}</div>
                     </div>
-
                 </div>
             {/each}
         </div>
