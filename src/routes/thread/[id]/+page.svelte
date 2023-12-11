@@ -276,7 +276,7 @@
                 <div class="bg-white shadow p-4 rounded-lg mt-4 relative flex">
 
                     <div class="absolute top-0 right-0 pt-2 pr-2 flex">
-                        {#if !post.deleted && isLoggedIn}
+                        {#if !thread.locked && !post.deleted && isLoggedIn}
                             <!-- Quote Button for all non-deleted posts -->
                             <button
                                     on:click={() => openNewPostModal(post.id, post.authorUsername)}
@@ -286,7 +286,7 @@
                                 <Icon src={Quote} class="w-4 h-4 text-green-500"/>
                             </button>
                         {/if}
-                        {#if post.authorId === userid && !post.deleted}
+                        {#if !thread.locked && post.authorId === userid && !post.deleted}
                             <!-- Edit Button -->
                             <button
                                     on:click={() => editPost(post.id, post.content, post.originatingPost)}

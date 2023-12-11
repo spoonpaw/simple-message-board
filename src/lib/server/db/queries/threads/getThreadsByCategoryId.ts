@@ -1,7 +1,7 @@
 // src/lib/server/db/queries/threads/getThreadsByCategoryId.ts
 
-import { pool } from '$lib/server';
-import type { ThreadCategoryView } from '$lib/shared/types/ThreadCategoryView';
+import {pool} from '$lib/server';
+import type {ThreadCategoryView} from '$lib/shared/types/ThreadCategoryView';
 
 // Define a local type for the specific structure returned by the query
 export async function getThreadsByCategoryId(categoryId: string): Promise<ThreadCategoryView[]> {
@@ -31,6 +31,7 @@ export async function getThreadsByCategoryId(categoryId: string): Promise<Thread
 					   END as last_replier_username,
 
 					   -- This CASE statement determines the timestamp of the last reply in the thread.
+					   -- It only runs if there's more than one post in the thread.
 					   CASE 
 						   WHEN (SELECT COUNT(*) FROM posts WHERE thread_id = t.id) > 1 THEN 
 							   -- Subquery to get the timestamp of the last post in the thread.
@@ -45,9 +46,9 @@ export async function getThreadsByCategoryId(categoryId: string): Promise<Thread
 				-- This join is necessary to get the username of the thread creator.
 				JOIN users u ON t.user_id = u.id
 
-				-- WHERE clause filters the threads by the category_id.
-				-- $1 is a placeholder for the category ID parameter passed to the query.
-				WHERE t.category_id = $1
+            -- WHERE clause filters the threads by the category_id and excludes deleted threads.
+            WHERE t.category_id = $1 AND t.is_deleted = FALSE
+
 			`,
 			[categoryId]
 		);

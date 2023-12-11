@@ -47,6 +47,7 @@ export interface Thread {
 	pinned: boolean;
 	locked: boolean;
 	created_at: Date;
+	is_deleted: boolean;
 }
 
 export interface Post {

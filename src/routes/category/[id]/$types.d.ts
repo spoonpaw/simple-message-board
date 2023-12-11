@@ -9,4 +9,5 @@ export interface PageServerData {
 	userid?: string; // User ID of the logged-in user
 	category: Category;
 	threads: ThreadCategoryView[];
+	permissions: Permission[];
 }

@@ -13,7 +13,7 @@ export async function getThreadById(threadId: string) {
             FROM threads t
             JOIN users u ON t.user_id = u.id
             JOIN categories c ON t.category_id = c.id
-            WHERE t.id = $1
+            WHERE t.id = $1 AND t.is_deleted = FALSE
         `,
 			[threadId]
 		);
