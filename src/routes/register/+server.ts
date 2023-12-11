@@ -27,14 +27,14 @@ export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
 
 	try {
 		// Check if email/username exists
-		const result = await client.query('SELECT 1 FROM users WHERE email = $1 OR username = $2', [
+		const userExists = await client.query('SELECT 1 FROM users WHERE email = $1 OR username = $2', [
 			email,
 			username
 		]);
 
-		const userCount = result.rowCount ?? 0;
+		const userExistsRowCount = userExists.rowCount ?? 0;
 
-		if (userCount > 0) {
+		if (userExistsRowCount > 0) {
 			client.release();
 			return new Response(JSON.stringify({ error: 'Username or email already exists.' }), {
 				status: 409,
@@ -47,12 +47,32 @@ export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
 		// Hash the password
 		const passwordHash = await bcrypt.hash(password, 10);
 
-		// Insert the new user into the database
-		const insertResult = await client.query(
-			'INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id, username',
-			[username, email, passwordHash]
-		);
+		// Find the default role
+		const defaultRoleResult = await client.query('SELECT id FROM roles WHERE is_default = TRUE');
+		let roleId;
 
+		if ((defaultRoleResult.rowCount ?? 0) > 0) {
+			roleId = defaultRoleResult.rows[0].id;
+		} else {
+			// Handle the case where no default role is found
+			// Option 1: Set a specific fallback role ID
+			// roleId = 'your-fallback-role-id';
+
+			// Option 2: Abort registration with an error message
+			client.release();
+			return new Response(JSON.stringify({ error: 'No default role set in the system.' }), {
+				status: 500,
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+		}
+
+		// Insert the new user into the database with the determined role
+		const insertResult = await client.query(
+			'INSERT INTO users (username, email, password_hash, role_id) VALUES ($1, $2, $3, $4) RETURNING id, username',
+			[username, email, passwordHash, roleId]
+		);
 		const newUser = insertResult.rows[0];
 
 		// Immediately log in the user by generating a JWT token

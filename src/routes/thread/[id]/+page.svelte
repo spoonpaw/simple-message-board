@@ -11,6 +11,9 @@
 	import {getTextFromHtml} from '$lib/shared/htmlUtils/getTextFromHtml';
 	import { parse, HTMLElement } from 'node-html-parser';
 
+	export let data: PageServerData;
+	let {username, userid, thread} = data;
+	const isLoggedIn = !!userid;
 
 	let editPostModal = false; // Modal for modifying an existing post
 	let editedPostId: string | null = null; // Track the ID of the post being edited
@@ -35,11 +38,6 @@
 	function handleEditedPostTextChange(event: CustomEvent) {
 		currentPostContent = event.detail.content;
 	}
-
-	export let data: PageServerData;
-	let {username, userid, thread} = data;
-	const isLoggedIn = !!userid;
-
 	function navigateToCategory() {
 		goto(`/category/${thread.category_id}`);
 	}
@@ -278,7 +276,7 @@
                 <div class="bg-white shadow p-4 rounded-lg mt-4 relative flex">
 
                     <div class="absolute top-0 right-0 pt-2 pr-2 flex">
-                        {#if !post.deleted}
+                        {#if !post.deleted && isLoggedIn}
                             <!-- Quote Button for all non-deleted posts -->
                             <button
                                     on:click={() => openNewPostModal(post.id, post.authorUsername)}
@@ -364,101 +362,101 @@
             {/each}
         </div>
     </div>
-
-    {#if !thread.locked && isLoggedIn}
-        <!-- New Post Modal -->
-        <Modal open={newPostModal}
-               title={quotingAuthorUsername ? `Quoting ${quotingAuthorUsername}'s Post` : "Add a Reply"}
-               on:close={closeNewPostModal}>
-
-            <div slot="body">
-                <form on:submit={submitNewPost}>
-                    <QuillEditor
-                            bind:this={newPostQuillEditor}
-                            initialContent={newPostContent}
-                            on:textChange={handleNewPostTextChange}
-                    />
-
-                    <!-- Character counter for Quill editor content -->
-                    <p class="text-right text-sm mb-4">
-                        {#if newPostContentLength > 8000}
-                            <span class="text-red-600">{newPostContentLength}/8000</span>
-                        {:else}
-                            <span class="text-gray-600">{newPostContentLength}/8000</span>
-                        {/if}
-                    </p>
-
-                    <div class="px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                        <button
-                                type="submit"
-                                class="w-full inline-flex justify-center rounded-md bg-blue-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
-                        >
-                            Submit
-                        </button>
-                        <button
-                                type="button"
-                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                                on:click={closeNewPostModal}
-                        >Cancel
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </Modal>
-
-        <!-- Edit Post Modal -->
-        <Modal open={editPostModal} title="Edit Post" on:close={closeEditPostModal}>
-            <div slot="body">
-                <form on:submit={submitEditedPost}>
-                    {#if isOriginatingPost}
-                        <input
-                                type="text"
-                                bind:value={currentThreadTitle}
-                                class="w-full p-2 border border-gray-300 rounded mb-4"
-                                placeholder="Thread Title"
-                                required
-                                maxlength="60"
-                        />
-                        <!-- Character counter -->
-                        <p class="text-right text-sm mb-4">
-                            {#if currentThreadTitleLength > 60}
-                                <span class="text-red-600">{currentThreadTitleLength}/60</span>
-                            {:else}
-                                <span class="text-gray-600">{currentThreadTitleLength}/60</span>
-                            {/if}
-                        </p>
-                    {/if}
-                    <QuillEditor
-                            bind:this={editPostQuillEditor}
-                            initialContent={currentPostContent}
-                            on:textChange={handleEditedPostTextChange}
-                    />
-
-                    <!-- Character counter for Quill editor content -->
-                    <p class="text-right text-sm mb-4">
-                        {#if currentPostContentLength > 8000}
-                            <span class="text-red-600">{currentPostContentLength}/8000</span>
-                        {:else}
-                            <span class="text-gray-600">{currentPostContentLength}/8000</span>
-                        {/if}
-                    </p>
-
-                    <div class="px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                        <button
-                                type="submit"
-                                class="w-full inline-flex justify-center rounded-md bg-blue-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
-                        >
-                            Save Changes
-                        </button>
-                        <button
-                                type="button"
-                                class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
-                                on:click={closeEditPostModal}
-                        >Cancel
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </Modal>
-    {/if}
 </div>
+
+{#if !thread.locked && isLoggedIn}
+    <!-- New Post Modal -->
+    <Modal open={newPostModal}
+           title={quotingAuthorUsername ? `Quoting ${quotingAuthorUsername}'s Post` : "Add a Reply"}
+           on:close={closeNewPostModal}>
+
+        <div slot="body">
+            <form on:submit={submitNewPost}>
+                <QuillEditor
+                        bind:this={newPostQuillEditor}
+                        initialContent={newPostContent}
+                        on:textChange={handleNewPostTextChange}
+                />
+
+                <!-- Character counter for Quill editor content -->
+                <p class="text-right text-sm mb-4">
+                    {#if newPostContentLength > 8000}
+                        <span class="text-red-600">{newPostContentLength}/8000</span>
+                    {:else}
+                        <span class="text-gray-600">{newPostContentLength}/8000</span>
+                    {/if}
+                </p>
+
+                <div class="px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                    <button
+                            type="submit"
+                            class="w-full inline-flex justify-center rounded-md bg-blue-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
+                    >
+                        Submit
+                    </button>
+                    <button
+                            type="button"
+                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                            on:click={closeNewPostModal}
+                    >Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </Modal>
+
+    <!-- Edit Post Modal -->
+    <Modal open={editPostModal} title="Edit Post" on:close={closeEditPostModal}>
+        <div slot="body">
+            <form on:submit={submitEditedPost}>
+                {#if isOriginatingPost}
+                    <input
+                            type="text"
+                            bind:value={currentThreadTitle}
+                            class="w-full p-2 border border-gray-300 rounded mb-4"
+                            placeholder="Thread Title"
+                            required
+                            maxlength="60"
+                    />
+                    <!-- Character counter -->
+                    <p class="text-right text-sm mb-4">
+                        {#if currentThreadTitleLength > 60}
+                            <span class="text-red-600">{currentThreadTitleLength}/60</span>
+                        {:else}
+                            <span class="text-gray-600">{currentThreadTitleLength}/60</span>
+                        {/if}
+                    </p>
+                {/if}
+                <QuillEditor
+                        bind:this={editPostQuillEditor}
+                        initialContent={currentPostContent}
+                        on:textChange={handleEditedPostTextChange}
+                />
+
+                <!-- Character counter for Quill editor content -->
+                <p class="text-right text-sm mb-4">
+                    {#if currentPostContentLength > 8000}
+                        <span class="text-red-600">{currentPostContentLength}/8000</span>
+                    {:else}
+                        <span class="text-gray-600">{currentPostContentLength}/8000</span>
+                    {/if}
+                </p>
+
+                <div class="px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                    <button
+                            type="submit"
+                            class="w-full inline-flex justify-center rounded-md bg-blue-500 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm"
+                    >
+                        Save Changes
+                    </button>
+                    <button
+                            type="button"
+                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                            on:click={closeEditPostModal}
+                    >Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </Modal>
+{/if}

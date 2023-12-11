@@ -2,10 +2,12 @@
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Roles Table
+-- Roles Table with Hierarchy Level
 CREATE TABLE roles (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    name VARCHAR(255) UNIQUE NOT NULL
+    name VARCHAR(255) UNIQUE NOT NULL,
+    hierarchy_level INT UNIQUE NOT NULL,
+    is_default BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 -- Permissions Table
@@ -36,15 +38,22 @@ CREATE TABLE users (
     profile_image_url VARCHAR(255) DEFAULT 'https://simplemessageboard-images.s3.us-west-1.amazonaws.com/default_avatar.png',
     bio TEXT
 );
--- Note: The role_id field in the users table is set to default to the 'User' role.
--- This default value should be set after roles are created using a separate query.
 
+-- Note: Insert initial role data with hierarchy levels. For example:
+-- INSERT INTO roles (name, hierarchy_level) VALUES ('Admin', 1);
+-- INSERT INTO roles (name, hierarchy_level) VALUES ('Moderator', 2);
+-- INSERT INTO roles (name, hierarchy_level) VALUES ('User', 3);
+-- Make sure to adjust these inserts according to your actual role requirements.
+
+-- The role_id field in the users table is set to default to the 'User' role.
+-- This default value should be set after roles are created using a separate query.
 -- Categories Table
 CREATE TABLE categories (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     title VARCHAR(255) NOT NULL,
-    description TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    description TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    is_deleted BOOLEAN DEFAULT FALSE
 );
 
 -- Threads Table

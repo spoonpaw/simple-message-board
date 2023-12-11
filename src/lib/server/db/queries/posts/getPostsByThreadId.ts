@@ -20,10 +20,12 @@ export async function getPostsByThreadId(threadId: string) {
             JOIN users u ON p.user_id = u.id
             LEFT JOIN roles r ON u.role_id = r.id
             LEFT JOIN (
-                SELECT user_id, COUNT(*) as post_count
-                FROM posts
-                WHERE deleted = FALSE
-                GROUP BY user_id
+                SELECT p.user_id, COUNT(*) as post_count
+                FROM posts p
+                JOIN threads t ON p.thread_id = t.id
+                JOIN categories c ON t.category_id = c.id
+                WHERE p.deleted = FALSE AND c.is_deleted = FALSE
+                GROUP BY p.user_id
             ) pc ON p.user_id = pc.user_id
             WHERE p.thread_id = $1
             ORDER BY p.created_at ASC

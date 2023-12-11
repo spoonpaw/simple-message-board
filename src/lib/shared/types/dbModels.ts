@@ -17,6 +17,8 @@ export interface User {
 export interface Role {
 	id: string;
 	name: string;
+    hierarchy_level: number; // Include hierarchy_level according to the database structure
+	is_default: boolean;
 }
 
 export interface Permission {
@@ -33,7 +35,7 @@ export interface RolePermission {
 export interface Category {
 	id: string;
 	title: string;
-	description: string | null;
+	description: string;
 	created_at: Date;
 }
 
@@ -56,4 +58,5 @@ export interface Post {
 	created_at: Date;
 	updated_at: Date | null;
 	deleted: boolean;
+    deleted_at?: Date; // Add deleted_at field for posts
 }
