@@ -5,6 +5,7 @@ import type { PageServerData } from './$types';
 import { validateUser } from '$lib/server/auth';
 import { getCategories } from '$lib/server/db/queries/categories/getCategories';
 import {getUserPermissionsByUserId} from "$lib/server/db/queries/permissions/getPermissionsByUserId";
+import type { Permission } from '$lib/shared';
 
 export async function load(requestEvent: RequestEvent): Promise<PageServerData> {
 	console.log('Starting load function for board page.');
@@ -12,7 +13,7 @@ export async function load(requestEvent: RequestEvent): Promise<PageServerData> 
 	const authenticatedUser = await validateUser(requestEvent);
 	let username: string;
 	let userid: string | undefined;
-	let permissions = [];
+	let permissions: Permission[] = [];
 
 	if (!authenticatedUser) {
 		console.log('No authenticated user, viewing anonymously.');

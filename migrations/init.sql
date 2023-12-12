@@ -36,7 +36,8 @@ CREATE TABLE users (
     confirmation_token UUID DEFAULT uuid_generate_v4(),
     is_confirmed BOOLEAN DEFAULT FALSE,
     profile_image_url VARCHAR(255) DEFAULT 'https://simplemessageboard-images.s3.us-west-1.amazonaws.com/default_avatar.png',
-    bio TEXT
+    bio TEXT,
+    banned BOOLEAN DEFAULT FALSE
 );
 
 -- Note: Insert initial role data with hierarchy levels. For example:
@@ -47,6 +48,7 @@ CREATE TABLE users (
 
 -- The role_id field in the users table is set to default to the 'User' role.
 -- This default value should be set after roles are created using a separate query.
+
 -- Categories Table
 CREATE TABLE categories (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

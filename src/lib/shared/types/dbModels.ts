@@ -12,6 +12,7 @@ export interface User {
 	is_confirmed: boolean;
 	profile_image_url: string;
 	bio?: string; // Optional bio field
+	banned: boolean;
 }
 
 export interface Role {

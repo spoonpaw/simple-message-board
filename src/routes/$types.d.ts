@@ -3,4 +3,5 @@
 export interface PageServerData {
 	username?: string;
 	userid?: string;
+	permissions?: Permission[];
 }

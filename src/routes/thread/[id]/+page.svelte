@@ -1,7 +1,7 @@
 <!--src/routes/thread/[id]/+page.svelte-->
 
 <script lang="ts">
-	import type {PageServerData, PostView} from './$types';
+	import type {PageServerData} from './$types';
 	import {goto} from '$app/navigation';
 	import {Icon} from '@steeze-ui/svelte-icon';
 	import {ArrowLeftCircle, Lock, Pencil, Pin, Trash2, Quote} from '@steeze-ui/lucide-icons';
@@ -9,10 +9,11 @@
 	import UserStatusHeader from '$lib/client/components/UserStatusHeader.svelte';
 	import QuillEditor from '$lib/client/components/QuillEditor.svelte';
 	import {getTextFromHtml} from '$lib/shared/htmlUtils/getTextFromHtml';
-	import { parse, HTMLElement } from 'node-html-parser';
+	import {parse, HTMLElement} from 'node-html-parser';
+	import type {PostThreadView} from "$lib/shared/types/PostThreadView";
 
 	export let data: PageServerData;
-	let {username, userid, thread} = data;
+	let {username, userid, thread, permissions} = data;
 	const isLoggedIn = !!userid;
 
 	let editPostModal = false; // Modal for modifying an existing post
@@ -31,6 +32,16 @@
 	let quotedPostId: string | null = null; // ID of the post being quoted
 	let quotingAuthorUsername: string | null = null; // Username of the author of the quoted post
 
+	let canDeleteAnyPost = false;
+	let canEditAnyPost = false;
+	let canAccessAdminPanel = false;
+
+	if (permissions) {
+		canDeleteAnyPost = permissions.some(permission => permission.name === 'delete_any_post');
+		canEditAnyPost = permissions.some(permission => permission.name === 'edit_any_post');
+		canAccessAdminPanel = permissions.some(permission => permission.name === 'access_admin_panel');
+	}
+
 	function handleNewPostTextChange(event: CustomEvent) {
 		newPostContent = event.detail.content;
 	}
@@ -38,6 +49,7 @@
 	function handleEditedPostTextChange(event: CustomEvent) {
 		currentPostContent = event.detail.content;
 	}
+
 	function navigateToCategory() {
 		goto(`/category/${thread.category_id}`);
 	}
@@ -200,7 +212,7 @@
 		}
 	}
 
-	function renderQuotedPost(quotedPost: PostView): string {
+	function renderQuotedPost(quotedPost: PostThreadView): string {
 		// Parse the content as HTML
 		const root = parse(quotedPost.content);
 
@@ -257,7 +269,7 @@
                 </div>
             </div>
 
-            <UserStatusHeader {isLoggedIn} {username} userId={userid ?? ''}/>
+            <UserStatusHeader {isLoggedIn} {username} userId={userid ?? ''} {canAccessAdminPanel}/>
         </div>
 
         {#if !thread.locked && isLoggedIn}
@@ -286,7 +298,7 @@
                                 <Icon src={Quote} class="w-4 h-4 text-green-500"/>
                             </button>
                         {/if}
-                        {#if !thread.locked && post.authorId === userid && !post.deleted}
+                        {#if !post.deleted && (!thread.locked || canEditAnyPost) && (post.authorId === userid || canEditAnyPost)}
                             <!-- Edit Button -->
                             <button
                                     on:click={() => editPost(post.id, post.content, post.originatingPost)}
@@ -295,6 +307,8 @@
                             >
                                 <Icon src={Pencil} class="w-4 h-4 text-blue-500"/>
                             </button>
+                        {/if}
+                        {#if !post.deleted && (!thread.locked || canDeleteAnyPost) && (post.authorId === userid || canDeleteAnyPost)}
                             <!-- Delete Button -->
                             <button
                                     on:click={() => deletePost(post.id)}
@@ -332,6 +346,12 @@
                                 />
                             </a>
                         </div>
+
+                        {#if post.authorIsBanned}
+                            <div class="text-center">
+                                <span class="bg-red-600 text-white text-xs font-bold py-1 px-2 rounded-full">Banned</span>
+                            </div>
+                        {/if}
                         <!-- Num. Posts by User -->
                         <div class="mt-2 text-sm text-gray-600">
                             Posts: {post.authorPostCount}

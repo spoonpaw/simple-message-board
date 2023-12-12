@@ -3,24 +3,13 @@
 import { error } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
 import { validateUser } from '$lib/server/auth';
-import { pool } from '$lib/server';
-
-async function fetchUserProfile(userId: string) {
-	const client = await pool.connect();
-	try {
-		const res = await client.query('SELECT * FROM users WHERE id = $1', [userId]);
-		console.log('User profile data:', res.rows[0]); // Log the fetched data
-		return res.rows[0];
-	} catch (err) {
-		console.error('Error fetching user profile:', err);
-		throw error(500, 'Internal Server Error');
-	} finally {
-		client.release();
-	}
-}
+import {getUserPermissionsByUserId} from "$lib/server/db/queries/permissions/getPermissionsByUserId";
+import { getHierarchyLevelByUserId } from "$lib/server/db/queries/users/getHierarchyLevelByUserId"; // Import the new function
+import type { Permission } from '$lib/shared';
+import {getUserById} from "$lib/server/db/queries/users/getUserById";
 
 export async function load(requestEvent: RequestEvent) {
-	const { id } = requestEvent.params;
+	const {id} = requestEvent.params;
 	if (!id) {
 		console.error('User ID is undefined');
 		throw error(404, 'User ID is required');
@@ -29,11 +18,22 @@ export async function load(requestEvent: RequestEvent) {
 	// Attempt to authenticate the user but do not redirect if not authenticated
 	const authenticatedUser = await validateUser(requestEvent);
 
-	const userProfile = await fetchUserProfile(id);
+	const userProfile = await getUserById(id);
 	if (!userProfile) {
 		console.error('No user profile found for user ID:', id);
 		throw error(404, 'User profile not found');
 	}
+
+	let permissions: Permission[] = [];
+    let authenticatedUserHierarchyLevel = null;
+    let requestedUserHierarchyLevel = null;
+
+	if (authenticatedUser) {
+		permissions = await getUserPermissionsByUserId(authenticatedUser.id);
+        authenticatedUserHierarchyLevel = await getHierarchyLevelByUserId(authenticatedUser.id);
+	}
+
+    requestedUserHierarchyLevel = await getHierarchyLevelByUserId(id);
 
 	// Check if the authenticated user is viewing their own profile
 	const isOwnProfile = authenticatedUser && authenticatedUser.id === id;
@@ -46,11 +46,16 @@ export async function load(requestEvent: RequestEvent) {
 			bio: userProfile.bio,
 			createdAt: userProfile.created_at,
 			lastLogin: userProfile.last_login,
-			isOwnProfile
+            hierarchyLevel: requestedUserHierarchyLevel, // Add hierarchy level here
+			isOwnProfile,
+			id: userProfile.id,
+			banned: userProfile.banned
 			// other user details...
 		},
 		isAuthenticated: !!authenticatedUser,
 		authenticatedUserId: authenticatedUser ? authenticatedUser.id : null,
-		authenticatedUsername: authenticatedUser ? authenticatedUser.username : 'Anonymous'
+		authenticatedUsername: authenticatedUser ? authenticatedUser.username : 'Anonymous',
+        authenticatedUserHierarchyLevel, // Pass hierarchy level of authenticated user
+		permissions: permissions
 	};
 }

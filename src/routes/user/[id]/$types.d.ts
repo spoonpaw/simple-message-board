@@ -9,6 +9,9 @@ export interface UserProfile {
 	bio: string;
 	createdAt: string;
 	lastLogin: string;
+	hierarchyLevel: number | null;
+	id: string;
+	banned: boolean;
 	// Include other properties specific to the user profile as needed
 }
 
@@ -18,4 +21,6 @@ export interface PageData {
 	isAuthenticated: boolean; // Indicates if the accessing user is authenticated
 	authenticatedUserId: string | null; // The ID of the authenticated user, if any
 	authenticatedUsername: string; // The username of the authenticated user, if any
+	authenticatedUserHierarchyLevel: number | null; // The hierarchy level of the authenticated user, if any
+	permissions: Permission[];
 }

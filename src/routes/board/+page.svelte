@@ -21,6 +21,7 @@
 	let canCreateCategory = false;
 	let canDeleteCategory = false;
 	let canModifyCategory = false;
+	let canAccessAdminPanel = false;
 
 	let newCategoryModal = false;
 	let newCategoryTitle = '';
@@ -41,8 +42,8 @@
 		canCreateCategory = permissions.some(permission => permission.name === 'create_category');
 		canDeleteCategory = permissions.some(permission => permission.name === 'delete_category');
 		canModifyCategory = permissions.some(permission => permission.name === 'modify_category');
+		canAccessAdminPanel = permissions.some(permission => permission.name === 'access_admin_panel');
 	}
-
 
 	async function submitEditCategory(event: SubmitEvent) {
 		event.preventDefault();
@@ -225,7 +226,7 @@
 
                 <h1 class="text-3xl font-semibold text-gray-800 mt-2">Message Board</h1>
             </div>
-            <UserStatusHeader {isLoggedIn} {username} userId={userid ?? ''}/>
+            <UserStatusHeader {isLoggedIn} {username} {canAccessAdminPanel} userId={userid ?? ''}/>
         </div>
 
         {#if canCreateCategory}

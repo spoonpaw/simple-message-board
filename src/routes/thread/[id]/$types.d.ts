@@ -10,28 +10,12 @@ export interface ThreadView {
 	created_at: string;
 	creator_username: string;
 	category_title: string;
-	posts: PostView[];
-}
-
-export interface PostView {
-	authorId: string;
-	authorPostCount: number;
-	authorProfileImageUrl: string;
-	authorRoleName: string;
-	authorUsername: string;
-	content: string;
-	createdAt: string;
-	deleted: boolean;
-	deletedAt: string | null;
-	id: string;
-	originatingPost: boolean;
-	quotedPost?: PostView | null;
-	quotedPostId: string | null;
-	updatedAt: string;
+	posts: PostThreadView[];
 }
 
 export interface PageServerData {
 	username: string;
 	userid?: string;
+	permissions: Permission[];
 	thread: ThreadView;
 }

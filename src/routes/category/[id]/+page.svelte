@@ -23,12 +23,14 @@
 	let canLockThread = false;
 	let canPinThread = false;
 	let canDeleteThread = false;
+	let canAccessAdminPanel = false;
 
 	// Check for permissions
 	if (permissions) {
 		canLockThread = permissions.some(permission => permission.name === 'lock_thread');
 		canPinThread = permissions.some(permission => permission.name === 'pin_thread');
 		canDeleteThread = permissions.some(permission => permission.name === 'delete_thread');
+		canAccessAdminPanel = permissions.some(permission => permission.name === 'access_admin_panel');
 	}
 
 	async function togglePinThread(threadId: string, pin: boolean) {
@@ -198,7 +200,7 @@
                 <h1 class="text-3xl font-semibold text-gray-800 mt-2">Category: {category.title}</h1>
             </div>
 
-            <UserStatusHeader {isLoggedIn} {username} userId={userid ?? ''}/>
+            <UserStatusHeader {isLoggedIn} {username} userId={userid ?? ''} {canAccessAdminPanel}/>
         </div>
         <p class="text-gray-600 mb-4">{category.description}</p>
         {#if isLoggedIn}

@@ -1,15 +1,15 @@
 // src/routes/login/+server.ts
 
-import type { RequestEvent, RequestHandler } from '@sveltejs/kit';
-import { pool } from '$lib/server';
+import type {RequestEvent, RequestHandler} from '@sveltejs/kit';
+import {pool} from '$lib/server';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { env } from '$env/dynamic/private';
-import { dev } from '$app/environment';
+import {env} from '$env/dynamic/private';
+import {dev} from '$app/environment';
 import cookie from 'cookie';
 
 export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
-	const { username, password } = await requestEvent.request.json();
+	const {username, password} = await requestEvent.request.json();
 
 	// Ensure the JWT_SECRET is defined
 	const JWT_SECRET = env.JWT_SECRET;
@@ -21,15 +21,15 @@ export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
 	const client = await pool.connect();
 
 	try {
-		// Check if the user exists
+		// Check if the user exists and fetch the banned status
 		const result = await client.query(
-			'SELECT id, username, password_hash FROM users WHERE username = $1',
+			'SELECT id, username, password_hash, banned FROM users WHERE username = $1',
 			[username]
 		);
 
 		if (result.rowCount === 0) {
 			client.release();
-			return new Response(JSON.stringify({ error: 'Username does not exist.' }), {
+			return new Response(JSON.stringify({error: 'Username does not exist.'}), {
 				status: 404,
 				headers: {
 					'Content-Type': 'application/json'
@@ -37,13 +37,26 @@ export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
 			});
 		}
 
-		// Check if the password is correct
+		// Extract user information
 		const user = result.rows[0];
+
+		// Check if the user is banned
+		if (user.banned) {
+			client.release();
+			return new Response(JSON.stringify({error: 'User is banned.'}), {
+				status: 403,
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			});
+		}
+
+		// Check if the password is correct
 		const passwordIsValid = await bcrypt.compare(password, user.password_hash);
 
 		if (!passwordIsValid) {
 			client.release();
-			return new Response(JSON.stringify({ error: 'Invalid password.' }), {
+			return new Response(JSON.stringify({error: 'Invalid password.'}), {
 				status: 401,
 				headers: {
 					'Content-Type': 'application/json'
@@ -56,9 +69,9 @@ export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
 
 		// JWT token issuance
 		const token = jwt.sign(
-			{ userId: user.id, username: user.username },
+			{userId: user.id, username: user.username},
 			JWT_SECRET,
-			{ expiresIn: '1h' } // Token expires in 1 hour
+			{expiresIn: '1h'} // Token expires in 1 hour
 		);
 
 		// Set the httpOnly cookie
@@ -71,7 +84,7 @@ export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
 		});
 
 		client.release();
-		return new Response(JSON.stringify({ message: 'Login successful.' }), {
+		return new Response(JSON.stringify({message: 'Login successful.'}), {
 			status: 200,
 			headers: {
 				'Set-Cookie': serializedCookie
@@ -80,7 +93,7 @@ export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
 	} catch (error) {
 		console.error('Database error:', error);
 		client.release();
-		return new Response(JSON.stringify({ error: 'Failed to log in.' }), {
+		return new Response(JSON.stringify({error: 'Failed to log in.'}), {
 			status: 500,
 			headers: {
 				'Content-Type': 'application/json'

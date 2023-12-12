@@ -1,9 +1,9 @@
-import { error } from '@sveltejs/kit';
+import {error} from '@sveltejs/kit';
 import cookie from 'cookie';
 import jwt from 'jsonwebtoken';
-import { env } from '$env/dynamic/private';
-import { pool } from '$lib/server/index';
-import type { RequestEvent } from '@sveltejs/kit';
+import {env} from '$env/dynamic/private';
+import {pool} from '$lib/server/index';
+import type {RequestEvent} from '@sveltejs/kit';
 
 export interface AuthenticatedUser {
 	id: string;
@@ -41,15 +41,22 @@ export async function validateUser(requestEvent: RequestEvent): Promise<Authenti
 
 		const client = await pool.connect();
 		try {
-			const userResult = await client.query('SELECT id, username FROM users WHERE id = $1', [
+			const userResult = await client.query('SELECT id, username, banned FROM users WHERE id = $1', [
 				userId
 			]);
 			if (userResult.rowCount === 0) {
 				console.log(`No user found for ID: ${userId}, returning null.`);
 				return null;
 			}
+
+			const user = userResult.rows[0];
+			if (user.banned) {
+				console.log(`User with ID: ${userId} is banned, returning null.`);
+				return null; // or handle banned user differently if needed
+			}
+
 			console.log('User found, returning user data.');
-			return userResult.rows[0];
+			return {id: user.id, username: user.username};
 		} finally {
 			client.release();
 		}

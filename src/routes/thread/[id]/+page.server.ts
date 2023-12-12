@@ -4,17 +4,23 @@ import { error } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
 import { validateUser } from '$lib/server/auth';
 import { getThreadById, getPostsByThreadId } from '$lib/server';
+import {getUserPermissionsByUserId} from "$lib/server/db/queries/permissions/getPermissionsByUserId";
+import type { Permission } from '$lib/shared';
 
 export async function load(requestEvent: RequestEvent) {
-	const { params } = requestEvent;
+	const {params} = requestEvent;
 
 	const authenticatedUser = await validateUser(requestEvent);
 	let username = 'Anonymous';
 	let userid: string | undefined = undefined;
+	let permissions: Permission[] = []; // Initialize an empty array for permissions
 
 	if (authenticatedUser) {
 		username = authenticatedUser.username;
 		userid = authenticatedUser.id;
+
+        // Fetch permissions for the authenticated user
+        permissions = await getUserPermissionsByUserId(userid);
 	}
 
 	const threadId = params.id;
@@ -32,6 +38,7 @@ export async function load(requestEvent: RequestEvent) {
 	return {
 		username,
 		userid,
+        permissions, // Pass permissions to the client
 		thread: {
 			...thread,
 			posts: posts

@@ -13,6 +13,7 @@ export async function getPostsByThreadId(threadId: string) {
                    u.username as author_username,
                    u.id as author_id,
                    u.profile_image_url as author_profile_image_url,
+                   u.banned as author_is_banned,
                    r.name as author_role_name,
                    pc.post_count as author_post_count
             FROM posts p
@@ -50,6 +51,7 @@ export async function getPostsByThreadId(threadId: string) {
 				authorProfileImageUrl: row.author_profile_image_url,
 				authorRoleName: row.author_role_name,
 				authorPostCount: row.author_post_count,
+				authorIsBanned: row.author_is_banned,  // Add the ban status to the post object
 				originatingPost: false, // Placeholder for originating post
 				quotedPost: null // Placeholder for quoted post
 			});
