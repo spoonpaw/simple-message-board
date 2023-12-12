@@ -1,8 +1,9 @@
 // src/lib/server/db/queries/permissions/getPermissionsByUserId.ts
 
 import {pool} from "$lib/server";
+import type {Permission} from "$lib/shared";
 
-export async function getUserPermissionsByUserId(userId: string) {
+export async function getUserPermissionsByUserId(userId: string): Promise<Permission[]> {
 	const client = await pool.connect();
 	try {
 		const permissionsResult = await client.query(

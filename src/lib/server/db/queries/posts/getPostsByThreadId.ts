@@ -17,16 +17,17 @@ export async function getPostsByThreadId(threadId: string) {
                    pc.post_count as author_post_count
             FROM posts p
             JOIN users u ON p.user_id = u.id
+			JOIN threads t ON p.thread_id = t.id
             LEFT JOIN roles r ON u.role_id = r.id
             LEFT JOIN (
                 SELECT p.user_id, COUNT(*) as post_count
                 FROM posts p
                 JOIN threads t ON p.thread_id = t.id
                 JOIN categories c ON t.category_id = c.id
-                WHERE p.deleted = FALSE AND c.is_deleted = FALSE
+				WHERE p.deleted = FALSE AND t.is_deleted = FALSE AND c.is_deleted = FALSE
                 GROUP BY p.user_id
             ) pc ON p.user_id = pc.user_id
-            WHERE p.thread_id = $1
+			WHERE p.thread_id = $1 AND t.is_deleted = FALSE
             ORDER BY p.created_at ASC
         `,
 			[threadId]

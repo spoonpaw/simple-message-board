@@ -1,11 +1,9 @@
-// src/lib/index.ts
+// src/lib/server/index.ts
 
 // place files you want to import through the `$lib` alias in this folder.
 
 // Exporting all from dbModels.ts
 export * from './db/pool';
-
-export * from './auth';
 
 export * from './db/queries/threads/getThreadsByCategoryId';
 

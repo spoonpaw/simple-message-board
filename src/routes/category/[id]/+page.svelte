@@ -31,6 +31,67 @@
 		canDeleteThread = permissions.some(permission => permission.name === 'delete_thread');
 	}
 
+	async function togglePinThread(threadId: string, pin: boolean) {
+		try {
+			const response = await fetch(`/thread/${threadId}/pin`, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({pin})
+			});
+
+			if (response.ok) {
+				// Update the threads array with the new list from the server
+				threads = await response.json();
+				console.log(`Thread ${pin ? 'pinned' : 'unpinned'} successfully`);
+			} else {
+				console.error('Failed to change thread pin state');
+			}
+		} catch (error) {
+			console.error('Error toggling thread pin state:', error);
+		}
+	}
+
+	async function toggleLockThread(threadId: string, lock: boolean) {
+		try {
+			const response = await fetch(`/thread/${threadId}/lock`, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({lock})
+			});
+
+			if (response.ok) {
+				// Update the threads array with the new list from the server
+				threads = await response.json();
+				console.log(`Thread ${lock ? 'locked' : 'unlocked'} successfully`);
+			} else {
+				console.error('Failed to change thread lock state');
+			}
+		} catch (error) {
+			console.error('Error toggling thread lock state:', error);
+		}
+	}
+
+	async function deleteThread(threadId: string) {
+		try {
+			const response = await fetch(`/thread/${threadId}`, {
+				method: 'DELETE'
+			});
+			if (response.ok) {
+				// Get the updated list of threads from the response
+				threads = await response.json();
+				console.log('Thread deleted successfully');
+			} else {
+				console.error('Failed to delete the thread');
+			}
+		} catch (error) {
+			console.error('Error deleting thread:', error);
+		}
+	}
+
 	function handleNewThreadTextChange(event: CustomEvent) {
 		newThreadContent = event.detail.content;
 	}
@@ -157,7 +218,10 @@
                             <button
                                     class="focus:outline-none hover:bg-gray-100 p-1 rounded"
                                     title="{thread.locked ? 'Unlock Thread' : 'Lock Thread'}"
-                                    on:click={(event) => { event.stopPropagation(); console.log(`${thread.locked ? 'Unlock' : 'Lock'} button clicked for thread id ${thread.id}`); }}
+                                    on:click={(event) => {
+                                        event.stopPropagation();
+                                        toggleLockThread(thread.id, !thread.locked);
+                                    }}
                             >
                                 <Icon src={thread.locked ? Unlock : Lock} class="w-4 h-4 text-gray-500"/>
                             </button>
@@ -167,17 +231,21 @@
                             <button
                                     class="focus:outline-none hover:bg-blue-100 p-1 rounded"
                                     title="{thread.pinned ? 'Unpin Thread' : 'Pin Thread'}"
-                                    on:click={(event) => { event.stopPropagation(); console.log(`${thread.pinned ? 'Unpin' : 'Pin'} button clicked for thread id ${thread.id}`); }}
+                                    on:click={(event) => {
+                                        event.stopPropagation();
+                                        togglePinThread(thread.id, !thread.pinned);
+                                    }}
                             >
                                 <Icon src={thread.pinned ? PinOff : Pin} class="w-4 h-4 text-blue-500"/>
                             </button>
+
                         {/if}
 
                         {#if canDeleteThread}
                             <button
                                     class="focus:outline-none hover:bg-red-100 p-1 rounded"
                                     title="Delete Thread"
-                                    on:click={(event) => { event.stopPropagation(); console.log(`Delete button clicked for thread id ${thread.id}`); }}
+                                    on:click={(event) => { event.stopPropagation(); deleteThread(thread.id); }}
                             >
                                 <Icon src={Trash2} class="w-4 h-4 text-red-500"/>
                             </button>
