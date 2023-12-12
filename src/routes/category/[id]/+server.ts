@@ -52,7 +52,7 @@ export async function PUT(requestEvent: RequestEvent) {
 }
 
 export async function DELETE(requestEvent: RequestEvent) {
-	const { request, params } = requestEvent;
+	const { params } = requestEvent;
 	const categoryId = params.id;
 	let client;
 

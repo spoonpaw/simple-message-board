@@ -1,7 +1,6 @@
 // src/lib/server/db/queries/threads/getPostsByThreadId.ts
 
 import {pool} from '../../pool';
-import {json} from "@sveltejs/kit";
 
 export async function getPostsByThreadId(threadId: string) {
 	const client = await pool.connect();
@@ -56,7 +55,7 @@ export async function getPostsByThreadId(threadId: string) {
 		});
 
 		// Process each post to include quoted post data
-		postsMap.forEach((post, postId) => {
+		postsMap.forEach((post) => {
 			if (post.quotedPostId && postsMap.has(post.quotedPostId)) {
 				const quotedPost = postsMap.get(post.quotedPostId);
 				post.quotedPost = quotedPost;
@@ -70,23 +69,6 @@ export async function getPostsByThreadId(threadId: string) {
 		if (posts.length > 0) {
 			posts[0].originatingPost = true;
 		}
-
-		// Recursive function to log the quote chain
-		function logQuoteChain(post: { quotedPost: any; id: any; }, depth = 0) {
-			const quotedPost = post.quotedPost;
-			console.log(`Depth ${depth}: Post ID ${post.id} quotes Post ID ${quotedPost ? quotedPost.id : 'None'}`);
-			if (quotedPost) {
-				logQuoteChain(quotedPost, depth + 1);
-			}
-		}
-
-		// Logging the quote chain for each post
-		posts.forEach(post => {
-			if (post.quotedPost) {
-				console.log(`Logging quote chain for Post ID ${post.id}`);
-				logQuoteChain(post);
-			}
-		});
 
 		return posts;
 	} finally {
