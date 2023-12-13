@@ -40,15 +40,6 @@ CREATE TABLE users (
     banned BOOLEAN DEFAULT FALSE
 );
 
--- Note: Insert initial role data with hierarchy levels. For example:
--- INSERT INTO roles (name, hierarchy_level) VALUES ('Admin', 1);
--- INSERT INTO roles (name, hierarchy_level) VALUES ('Moderator', 2);
--- INSERT INTO roles (name, hierarchy_level) VALUES ('User', 3);
--- Make sure to adjust these inserts according to your actual role requirements.
-
--- The role_id field in the users table is set to default to the 'User' role.
--- This default value should be set after roles are created using a separate query.
-
 -- Categories Table
 CREATE TABLE categories (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
