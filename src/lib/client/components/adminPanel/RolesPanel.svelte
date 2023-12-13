@@ -4,6 +4,8 @@
 	import {createEventDispatcher} from "svelte";
 	import {Icon} from '@steeze-ui/svelte-icon';
 	import {Pencil, Trash2} from '@steeze-ui/lucide-icons';
+	import ToastContainer from "$lib/client/components/common/ToastContainer.svelte";
+	import {toastManager} from "../../../../stores/toastManager";
 
 	export let roles: Role[] = [];
 	let showCreateRoleModal = false;
@@ -12,10 +14,96 @@
 	let newRoleIsDefault = false;
 	const dispatch = createEventDispatcher();
 
+	let showEditRoleModal = false;
+	let editingRole: Role | null = null;
+	let editRoleName = '';
+	let editRoleHierarchyLevel = '';
+	let editRoleIsDefault = false;
+
+
 	function handleEdit(roleId: string) {
-		// Your edit logic here
-		console.log('Edit role with ID:', roleId);
+		const roleToEdit = roles.find(role => role.id === roleId);
+		if (roleToEdit) {
+			editingRole = {...roleToEdit};
+			editRoleName = editingRole.name;
+			editRoleHierarchyLevel = editingRole.hierarchy_level.toString();
+			editRoleIsDefault = editingRole.is_default;
+			showEditRoleModal = true;
+		}
 	}
+
+	function closeEditModal() {
+		editingRole = null;
+		editRoleName = '';
+		editRoleHierarchyLevel = '';
+		editRoleIsDefault = false;
+		showEditRoleModal = false;
+	}
+
+	// Update role logic here
+	async function updateRole() {
+		if (!editingRole) return;
+
+		// Validate editRoleName is not empty
+		if (!editRoleName.trim()) {
+			return;
+		}
+
+		// Parse and validate editRoleHierarchyLevel
+		const hierarchyLevel = parseInt(editRoleHierarchyLevel);
+		if (!Number.isInteger(hierarchyLevel) || hierarchyLevel < 0) {
+			return;
+		}
+
+		try {
+			const response = await fetch(`/role/${editingRole.id}`, {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					name: editRoleName,
+					hierarchyLevel: hierarchyLevel,
+					isDefault: editRoleIsDefault,
+				}),
+			});
+
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`);
+			}
+
+			const result = await response.json();
+
+			// Handle the scenario where no changes were detected
+			if (result.message && result.message === "No changes were detected.") {
+				toastManager.addToast({
+					message: 'No changes were detected.',
+					type: 'info',
+					duration: 3000
+				});
+			} else {
+				console.log('Role updated successfully:', result);
+				toastManager.addToast({
+					message: 'Role updated successfully',
+					type: 'success',
+					duration: 3000
+				});
+
+				// Dispatch the event with the updated roles
+				dispatch('rolesupdated', {roles: result});
+			}
+
+			closeEditModal(); // Reset the modal values
+		} catch (error) {
+			console.error('Error updating role:', error);
+			toastManager.addToast({
+				message: 'Error updating role',
+				type: 'error',
+				duration: 3000
+			});
+		}
+	}
+
 
 	// Function for handling delete
 	async function handleDelete(roleId: string) {
@@ -28,20 +116,34 @@
 			});
 
 			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
+				// Extract the error message from the server's response
+				const errorResponse = await response.json();
+				const errorMessage = errorResponse.error || `HTTP error! status: ${response.status}`;
+				throw new Error(errorMessage);
 			}
 
 			const updatedRoles = await response.json();
 			console.log('Role deleted successfully:', updatedRoles);
 
+			toastManager.addToast({
+				message: 'Role deleted successfully',
+				type: 'success',
+				duration: 3000
+			});
+
 			// Dispatch the event with the updated roles
-			dispatch('rolesupdated', { roles: updatedRoles });
+			dispatch('rolesupdated', {roles: updatedRoles});
 		} catch (error) {
 			console.error('Error deleting role:', error);
-			// Optionally, show an error message to the user
+			// Check if error is an instance of Error and then show the message
+			const message = (error instanceof Error) ? error.message : 'Unknown error occurred';
+			toastManager.addToast({
+				message: message,
+				type: 'error',
+				duration: 3000
+			});
 		}
 	}
-
 
 	async function createRole() {
 		// Validate newRoleName is not empty
@@ -79,30 +181,54 @@
 			const updatedRoles = await response.json();
 			console.log('Role created successfully:', updatedRoles);
 
+			toastManager.addToast({
+				message: 'Role created successfully',
+				type: 'success',
+				duration: 3000
+			});
+
 			// Dispatch the event with the updated roles
 			dispatch('rolesupdated', {roles: updatedRoles});
 
-			showCreateRoleModal = false; // Close the modal after successful creation
+			handleClose(); // Reset the modal values
 		} catch (error) {
 			console.error('Error creating role:', error);
 			// Optionally, show an error message to the user
+			toastManager.addToast({
+				message: 'Error creating role',
+				type: 'error',
+				duration: 3000
+			});
 		}
 	}
 
 	// Function to close the modal
 	function handleClose() {
+		newRoleName = '';
+		newRoleHierarchyLevel = ''; // Starts as an empty string
+		newRoleIsDefault = false;
 		showCreateRoleModal = false;
 	}
 
 	// Function to ensure only integer values are entered
-	function handleHierarchyLevelInput(event: Event) {
+	function handleNewRoleHierarchyLevelInput(event: Event) {
 		const input = event.target as HTMLInputElement | null;
 		if (input) {
 			const value = input.value;
 			newRoleHierarchyLevel = value.replace(/[^0-9]/g, ''); // Remove non-integer characters
 		}
 	}
+
+	function handleEditRoleHierarchyLevelInput(event: Event) {
+		const input = event.target as HTMLInputElement | null;
+		if (input) {
+			const value = input.value;
+			editRoleHierarchyLevel = value.replace(/[^0-9]/g, ''); // Remove non-integer characters
+		}
+	}
 </script>
+
+<ToastContainer/>
 
 <div class="flex flex-wrap justify-center gap-6 items-stretch">
     {#each roles as role}
@@ -132,8 +258,17 @@
                 >
                     <Icon src={Trash2} class="w-4 h-4 text-red-500"/>
                 </button>
-                <h2 class="text-xl font-semibold text-blue-600 mb-2">{role.name}</h2>
-                <p class="text-gray-600 mb-4 flex-grow">
+                <div class="flex flex-col mb-2">
+                    <div class="flex items-center space-x-2">
+                        <h2 class="text-xl font-semibold text-blue-600">
+                            {role.name}
+                        </h2>
+                        {#if role.is_default}
+                            <span class="bg-green-500 text-white px-2 py-0.5 text-xs rounded-full">Default</span>
+                        {/if}
+                    </div>
+                </div>
+                <p class="text-gray-600 flex-grow">
                     Hierarchy Level: {role.hierarchy_level}
                 </p>
             </div>
@@ -174,7 +309,7 @@
                         class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                         required
                         bind:value={newRoleHierarchyLevel}
-                        on:input={handleHierarchyLevelInput}/>
+                        on:input={handleNewRoleHierarchyLevelInput}/>
             </div>
 
             <!-- Default Role Checkbox -->
@@ -204,6 +339,65 @@
                 </button>
             </div>
 
+        </form>
+    </div>
+</Modal>
+
+<Modal title="Edit Role" bind:open={showEditRoleModal} on:close={closeEditModal}>
+    <div slot="body">
+        <form on:submit|preventDefault={updateRole} class="bg-white rounded px-8 pt-6 pb-8 mb-4">
+            <p class="text-lg text-gray-700 mb-4">Edit the details of the role:</p>
+
+            <!-- Role Name Input -->
+            <div class="mb-4">
+                <label for="editRoleName" class="block text-gray-700 text-sm font-bold mb-2">Role Name</label>
+                <input
+                        id="editRoleName"
+                        type="text"
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        required
+                        bind:value={editRoleName}/>
+            </div>
+
+            <!-- Hierarchy Level Input -->
+            <div class="mb-4">
+                <label for="editHierarchyLevel" class="block text-gray-700 text-sm font-bold mb-2">Hierarchy
+                    Level</label>
+                <input
+                        id="editHierarchyLevel"
+                        type="text"
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        required
+                        bind:value={editRoleHierarchyLevel}
+                        on:input={handleEditRoleHierarchyLevelInput}/>
+            </div>
+
+            <!-- Default Role Checkbox -->
+            <div class="mb-6">
+                <label for="editDefaultRole" class="block text-gray-700 text-sm font-bold mb-2">
+                    <input
+                            id="editDefaultRole"
+                            type="checkbox"
+                            class="mr-2 leading-tight"
+                            bind:checked={editRoleIsDefault}/>
+                    Default Role
+                </label>
+            </div>
+
+            <!-- Buttons -->
+            <div class="flex items-center justify-between">
+                <button
+                        type="button"
+                        class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        on:click={closeEditModal}>
+                    Cancel
+                </button>
+                <button
+                        type="submit"
+                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    Update
+                </button>
+            </div>
         </form>
     </div>
 </Modal>

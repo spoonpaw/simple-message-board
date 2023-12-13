@@ -7,6 +7,12 @@ export async function insertRole(newRole: Omit<Role, 'id'>): Promise<Role> {
 	const client = await pool.connect();
 
 	try {
+        // If the new role is set to be the default, update all other roles
+        if (newRole.is_default) {
+            const unsetDefaultQuery = 'UPDATE roles SET is_default = FALSE WHERE is_default = TRUE;';
+            await client.query(unsetDefaultQuery);
+        }
+
 		const insertQuery = `
             INSERT INTO roles (name, hierarchy_level, is_default)
             VALUES ($1, $2, $3)
