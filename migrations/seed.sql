@@ -1,5 +1,31 @@
 -- seed.sql
 
+-- Insert default roles
+INSERT INTO roles (name) VALUES ('Administrator'), ('User');
+
+-- Insert default permissions
+INSERT INTO permissions (name, description) VALUES
+    ('create_post', 'Can create posts'),
+    ('edit_own_post', 'Can edit own posts'),
+    ('delete_own_post', 'Can delete own posts'),
+    ('edit_any_post', 'Can edit any post'),
+    ('delete_any_post', 'Can delete any post'),
+    ('pin_thread', 'Can pin threads'),
+    ('lock_thread', 'Can lock threads');
+
+-- Associate permissions with roles
+-- Giving 'Administrator' all permissions
+INSERT INTO role_permissions (role_id, permission_id)
+SELECT roles.id, permissions.id
+FROM roles, permissions
+WHERE roles.name = 'Administrator';
+
+-- Giving 'User' basic permissions
+INSERT INTO role_permissions (role_id, permission_id)
+SELECT roles.id, permissions.id
+FROM roles, permissions
+WHERE roles.name = 'User' AND permissions.name IN ('create_post', 'edit_own_post', 'delete_own_post');
+
 -- Seed data for Categories
 INSERT INTO categories (title, description) VALUES
 ('General Discussion', 'A place for general chit-chat and topics that don''t fit elsewhere.'),
