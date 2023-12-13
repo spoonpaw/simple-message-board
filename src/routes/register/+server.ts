@@ -100,6 +100,7 @@ export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
 				'Set-Cookie': serializedCookie
 			}
 		});
+
 	} catch (error) {
 		console.error('Database error:', error);
 		client.release();

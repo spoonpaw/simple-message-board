@@ -36,7 +36,7 @@
 
 			if (res.ok) {
 				successMessage.set(data.message || 'Registration successful!');
-				await goto('/board'); // Redirect to the board
+				await goto('/'); // Redirect to the home page
 			} else {
 				errorMessage.set(data.error || 'An error occurred during registration.');
 			}
