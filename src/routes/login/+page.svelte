@@ -22,7 +22,7 @@
 
             if (res.ok) {
                 // Use SvelteKit's goto function for client-side navigation
-                await goto('/board'); // Assuming '/board' is the route for the message board
+                await goto('/'); // Assuming '/' is the route for the home page
             } else {
                 errorMessage.set(data.error || 'Invalid username or password.');
             }
