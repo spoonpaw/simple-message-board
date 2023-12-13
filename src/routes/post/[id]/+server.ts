@@ -6,7 +6,7 @@ import {getPostsByThreadId, pool} from '$lib/server';
 import {error, json} from '@sveltejs/kit';
 import sanitizeHtml from 'sanitize-html';
 import {getTextFromHtml} from '$lib/shared/htmlUtils/getTextFromHtml';
-import {getUserPermissionsByUserId} from "$lib/server/db/queries/permissions/getPermissionsByUserId";
+import {getPermissionsByUserId} from "$lib/server/db/queries/permissions/getPermissionsByUserId";
 
 export async function PUT(requestEvent: RequestEvent) {
 	const {params, request} = requestEvent;
@@ -35,7 +35,7 @@ export async function PUT(requestEvent: RequestEvent) {
 	const client = await pool.connect();
 	try {
 		// Check user permissions
-		const permissions = await getUserPermissionsByUserId(authenticatedUser.id);
+		const permissions = await getPermissionsByUserId(authenticatedUser.id);
 		const canEditAnyPost = permissions.some(p => p.name === 'edit_any_post');
 
 		await client.query('BEGIN'); // Start transaction
@@ -120,7 +120,7 @@ export async function DELETE(requestEvent: RequestEvent) {
 		}
 
 		// Check if the user has permission to delete any post
-		const permissions = await getUserPermissionsByUserId(authenticatedUser.id);
+		const permissions = await getPermissionsByUserId(authenticatedUser.id);
 		const canDeleteAnyPost = permissions.some(p => p.name === 'delete_any_post');
 
 		let deleteResult;

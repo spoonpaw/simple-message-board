@@ -2,7 +2,7 @@
 
 import type {RequestEvent} from '@sveltejs/kit';
 import {pool} from '$lib/server';
-import {getUserPermissionsByUserId} from '$lib/server/db/queries/permissions/getPermissionsByUserId';
+import {getPermissionsByUserId} from '$lib/server/db/queries/permissions/getPermissionsByUserId';
 import {getThreadsByCategoryId} from '$lib/server/db/queries/threads/getThreadsByCategoryId';
 import {validateUser} from "$lib/server/auth";
 
@@ -20,7 +20,7 @@ export async function PUT(requestEvent: RequestEvent) {
 		}
 
 		// Check if the user has permission to pin threads
-		const permissions = await getUserPermissionsByUserId(user.id);
+		const permissions = await getPermissionsByUserId(user.id);
 		const canPinThread = permissions.some(p => p.name === 'pin_thread');
 		if (!canPinThread) {
 			return new Response(null, {status: 403}); // Forbidden

@@ -3,7 +3,7 @@
 import { error } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
 import { validateUser } from '$lib/server/auth';
-import {getUserPermissionsByUserId} from "$lib/server/db/queries/permissions/getPermissionsByUserId";
+import {getPermissionsByUserId} from "$lib/server/db/queries/permissions/getPermissionsByUserId";
 import { getHierarchyLevelByUserId } from "$lib/server/db/queries/users/getHierarchyLevelByUserId"; // Import the new function
 import type { Permission } from '$lib/shared';
 import {getUserById} from "$lib/server/db/queries/users/getUserById";
@@ -29,7 +29,7 @@ export async function load(requestEvent: RequestEvent) {
     let requestedUserHierarchyLevel = null;
 
 	if (authenticatedUser) {
-		permissions = await getUserPermissionsByUserId(authenticatedUser.id);
+		permissions = await getPermissionsByUserId(authenticatedUser.id);
         authenticatedUserHierarchyLevel = await getHierarchyLevelByUserId(authenticatedUser.id);
 	}
 

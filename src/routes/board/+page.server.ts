@@ -4,7 +4,7 @@ import type { RequestEvent } from '@sveltejs/kit';
 import type { PageServerData } from './$types';
 import { validateUser } from '$lib/server/auth';
 import { getCategories } from '$lib/server/db/queries/categories/getCategories';
-import {getUserPermissionsByUserId} from "$lib/server/db/queries/permissions/getPermissionsByUserId";
+import {getPermissionsByUserId} from "$lib/server/db/queries/permissions/getPermissionsByUserId";
 import type { Permission } from '$lib/shared';
 
 export async function load(requestEvent: RequestEvent): Promise<PageServerData> {
@@ -23,7 +23,7 @@ export async function load(requestEvent: RequestEvent): Promise<PageServerData> 
 		console.log('User authenticated, fetching categories and permissions.');
 		username = authenticatedUser.username;
 		userid = authenticatedUser.id;
-		permissions = await getUserPermissionsByUserId(userid);
+		permissions = await getPermissionsByUserId(userid);
 	}
 
 	const categories = await getCategories();

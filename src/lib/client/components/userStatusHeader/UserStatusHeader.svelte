@@ -1,10 +1,10 @@
 <!-- src/lib/client/components/UserStatusHeader.svelte -->
 
 <script lang="ts">
-	import UserProfileButton from '$lib/client/components/UserProfileButton.svelte';
-	import LoginButton from '$lib/client/components/LoginButton.svelte';
-	import AdminButton from "$lib/client/components/AdminButton.svelte";
-	import LogoutButton from "$lib/client/components/LogoutButton.svelte";
+	import UserProfileButton from '$lib/client/components/userStatusHeader/UserProfileButton.svelte';
+	import LoginButton from '$lib/client/components/userStatusHeader/LoginButton.svelte';
+	import AdminButton from "$lib/client/components/userStatusHeader/AdminButton.svelte";
+	import LogoutButton from "$lib/client/components/userStatusHeader/LogoutButton.svelte";
 
 	export let username: string;
 	export let isLoggedIn: boolean;
@@ -17,8 +17,7 @@
     {#if isLoggedIn}
         {#if canAccessAdminPanel}  <!-- Conditionally render AdminButton -->
             <div>
-                <!--uncomment this when you have built the admin page-->
-                <!--<AdminButton/>-->
+                <AdminButton/>
             </div>
         {/if}
         <div>

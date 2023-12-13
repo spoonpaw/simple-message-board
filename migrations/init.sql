@@ -6,7 +6,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE roles (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(255) UNIQUE NOT NULL,
-    hierarchy_level INT UNIQUE NOT NULL,
+    hierarchy_level INT NOT NULL,
     is_default BOOLEAN NOT NULL DEFAULT FALSE
 );
 

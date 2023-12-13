@@ -6,8 +6,8 @@
 	import {goto} from '$app/navigation';
 	import {Icon} from '@steeze-ui/svelte-icon';
 	import {Home, Pencil, Trash2} from '@steeze-ui/lucide-icons';
-	import UserStatusHeader from '$lib/client/components/UserStatusHeader.svelte';
-	import Modal from "$lib/client/components/Modal.svelte";
+	import UserStatusHeader from '$lib/client/components/userStatusHeader/UserStatusHeader.svelte';
+	import Modal from "$lib/client/components/common/Modal.svelte";
 	import {fade} from 'svelte/transition';
 
 	export let data: PageServerData;

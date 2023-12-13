@@ -2,7 +2,7 @@ import { error } from '@sveltejs/kit';
 import type { RequestEvent } from '@sveltejs/kit';
 import type { PageServerData } from './$types';
 import { validateUser } from '$lib/server/auth';
-import {getUserPermissionsByUserId} from "$lib/server/db/queries/permissions/getPermissionsByUserId"; // Import the validateUser function
+import {getPermissionsByUserId} from "$lib/server/db/queries/permissions/getPermissionsByUserId"; // Import the validateUser function
 
 export async function load(requestEvent: RequestEvent): Promise<PageServerData> {
 	try {
@@ -15,7 +15,7 @@ export async function load(requestEvent: RequestEvent): Promise<PageServerData> 
 			return {};
 		}
 
-		const permissions = await getUserPermissionsByUserId(authenticatedUser.id);
+		const permissions = await getPermissionsByUserId(authenticatedUser.id);
 
 		// User is authenticated, return their username
 		return {

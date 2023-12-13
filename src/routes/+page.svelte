@@ -36,13 +36,12 @@
 			</h1>
 			<nav class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 justify-center">
                 {#if canAccessAdminPanel}
-					<!--uncomment this when the admin page is done-->
-                    <!--<a
+                    <a
                         href="/admin"
                         class="inline-block px-6 py-3 bg-orange-600 text-white font-semibold rounded-lg shadow-md hover:bg-orange-700 transition duration-300"
                     >
                         Admin Panel
-                    </a>-->
+                    </a>
                 {/if}
 				<button
 					on:click={logout}

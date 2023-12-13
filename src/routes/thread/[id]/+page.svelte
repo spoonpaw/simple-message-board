@@ -5,9 +5,9 @@
 	import {goto} from '$app/navigation';
 	import {Icon} from '@steeze-ui/svelte-icon';
 	import {ArrowLeftCircle, Lock, Pencil, Pin, Trash2, Quote} from '@steeze-ui/lucide-icons';
-	import Modal from '$lib/client/components/Modal.svelte';
-	import UserStatusHeader from '$lib/client/components/UserStatusHeader.svelte';
-	import QuillEditor from '$lib/client/components/QuillEditor.svelte';
+	import Modal from '$lib/client/components/common/Modal.svelte';
+	import UserStatusHeader from '$lib/client/components/userStatusHeader/UserStatusHeader.svelte';
+	import QuillEditor from '$lib/client/components/common/QuillEditor.svelte';
 	import {getTextFromHtml} from '$lib/shared/htmlUtils/getTextFromHtml';
 	import {parse, HTMLElement} from 'node-html-parser';
 	import type {PostThreadView} from "$lib/shared/types/PostThreadView";

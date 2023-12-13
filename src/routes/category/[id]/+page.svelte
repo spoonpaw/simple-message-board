@@ -5,10 +5,10 @@
 	import {goto} from '$app/navigation';
 	import {Icon} from '@steeze-ui/svelte-icon';
 	import {Pin, Lock, ArrowLeftCircle, Trash2, PinOff, Unlock} from '@steeze-ui/lucide-icons';
-	import UserStatusHeader from '$lib/client/components/UserStatusHeader.svelte';
-	import Modal from '$lib/client/components/Modal.svelte';
+	import UserStatusHeader from '$lib/client/components/userStatusHeader/UserStatusHeader.svelte';
+	import Modal from '$lib/client/components/common/Modal.svelte';
 	import type {ThreadCategoryView} from '$lib/shared';
-	import QuillEditor from '$lib/client/components/QuillEditor.svelte';
+	import QuillEditor from '$lib/client/components/common/QuillEditor.svelte';
 	import {getTextFromHtml} from '$lib/shared/htmlUtils/getTextFromHtml';
 
 	export let data: PageServerData;

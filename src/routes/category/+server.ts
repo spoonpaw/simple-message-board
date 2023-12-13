@@ -2,7 +2,7 @@
 
 import type { RequestEvent } from '@sveltejs/kit';
 import { validateUser } from '$lib/server/auth';
-import { getUserPermissionsByUserId } from '$lib/server/db/queries/permissions/getPermissionsByUserId';
+import { getPermissionsByUserId } from '$lib/server/db/queries/permissions/getPermissionsByUserId';
 import { getCategories } from '$lib/server/db/queries/categories/getCategories';
 import {pool} from "$lib/server";
 
@@ -17,7 +17,7 @@ export async function POST(requestEvent: RequestEvent) {
 		}
 
 		// Check if the user has permission to create categories
-		const permissions = await getUserPermissionsByUserId(user.id);
+		const permissions = await getPermissionsByUserId(user.id);
 		const canCreateCategory = permissions.some(p => p.name === 'create_category');
 		if (!canCreateCategory) {
 			return new Response(null, { status: 403 }); // Forbidden

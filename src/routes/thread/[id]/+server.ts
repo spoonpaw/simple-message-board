@@ -4,7 +4,7 @@ import type {RequestEvent} from '@sveltejs/kit';
 import {pool} from '$lib/server';
 import {validateUser} from '$lib/server/auth';
 import {getThreadsByCategoryId} from '$lib/server/db/queries/threads/getThreadsByCategoryId';
-import {getUserPermissionsByUserId} from "$lib/server/db/queries/permissions/getPermissionsByUserId";
+import {getPermissionsByUserId} from "$lib/server/db/queries/permissions/getPermissionsByUserId";
 
 export async function DELETE(requestEvent: RequestEvent) {
 	const threadId = requestEvent.params.id;
@@ -19,7 +19,7 @@ export async function DELETE(requestEvent: RequestEvent) {
 		}
 
 		// Check if the user has permission to delete threads
-		const permissions = await getUserPermissionsByUserId(user.id);
+		const permissions = await getPermissionsByUserId(user.id);
 		const canDeleteThread = permissions.some(p => p.name === 'delete_thread');
 		if (!canDeleteThread) {
 			return new Response(null, {status: 403}); // Forbidden

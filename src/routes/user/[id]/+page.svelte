@@ -4,8 +4,8 @@
 	import type {PageData} from './$types';
 	import {Icon} from '@steeze-ui/svelte-icon';
 	import {ArrowLeftCircle, Pencil} from '@steeze-ui/lucide-icons';
-	import UserStatusHeader from '$lib/client/components/UserStatusHeader.svelte';
-	import Modal from '$lib/client/components/Modal.svelte';
+	import UserStatusHeader from '$lib/client/components/userStatusHeader/UserStatusHeader.svelte';
+	import Modal from '$lib/client/components/common/Modal.svelte';
 
 	export let data: PageData;
 

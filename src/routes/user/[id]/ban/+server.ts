@@ -2,7 +2,7 @@
 
 import type {RequestEvent} from '@sveltejs/kit';
 import {pool} from '$lib/server';
-import {getUserPermissionsByUserId} from '$lib/server/db/queries/permissions/getPermissionsByUserId';
+import {getPermissionsByUserId} from '$lib/server/db/queries/permissions/getPermissionsByUserId';
 import {validateUser} from "$lib/server/auth";
 import {getHierarchyLevelByUserId} from "$lib/server/db/queries/users/getHierarchyLevelByUserId";
 import {getUserById} from "$lib/server/db/queries/users/getUserById"; // Make sure you have this function
@@ -26,7 +26,7 @@ export async function PUT(requestEvent: RequestEvent) {
 			return new Response(null, {status: 401}); // Unauthorized
 		}
 
-		const permissions = await getUserPermissionsByUserId(user.id);
+		const permissions = await getPermissionsByUserId(user.id);
 
 		const canBanUsers = permissions.some(p => p.name === 'ban_user_lower_role');
 		if (!canBanUsers) {

@@ -5,7 +5,8 @@ import type { RequestEvent } from '@sveltejs/kit';
 import { validateUser } from '$lib/server/auth';
 import type { PageServerData } from './$types';
 import { getThreadsByCategoryId, pool } from '$lib/server';
-import {getUserPermissionsByUserId} from "$lib/server/db/queries/permissions/getPermissionsByUserId";
+import {getPermissionsByUserId} from "$lib/server/db/queries/permissions/getPermissionsByUserId";
+import type {Permission} from "$lib/shared";
 
 export async function load(requestEvent: RequestEvent): Promise<PageServerData> {
 	const { params } = requestEvent;
@@ -14,12 +15,12 @@ export async function load(requestEvent: RequestEvent): Promise<PageServerData> 
 	const authenticatedUser = await validateUser(requestEvent);
 	let username = 'Anonymous';
 	let userid: string | undefined = undefined;
-	let permissions: string[] = [];
+	let permissions: Permission[] = [];
 
 	if (authenticatedUser) {
 		username = authenticatedUser.username;
 		userid = authenticatedUser.id;
-		permissions = await getUserPermissionsByUserId(userid);
+		permissions = await getPermissionsByUserId(userid);
 	}
 
 	const categoryId = params.id;
