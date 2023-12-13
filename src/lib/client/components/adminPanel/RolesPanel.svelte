@@ -2,6 +2,8 @@
 	import type {Role} from "$lib/shared";
 	import Modal from "$lib/client/components/common/Modal.svelte";
 	import {createEventDispatcher} from "svelte";
+	import {Icon} from '@steeze-ui/svelte-icon';
+	import {Pencil, Trash2} from '@steeze-ui/lucide-icons';
 
 	export let roles: Role[] = [];
 	let showCreateRoleModal = false;
@@ -9,6 +11,36 @@
 	let newRoleHierarchyLevel = ''; // Starts as an empty string
 	let newRoleIsDefault = false;
 	const dispatch = createEventDispatcher();
+
+	function handleEdit(roleId: string) {
+		// Your edit logic here
+		console.log('Edit role with ID:', roleId);
+	}
+
+	// Function for handling delete
+	async function handleDelete(roleId: string) {
+		try {
+			const response = await fetch(`/role/${roleId}`, {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json',
+				}
+			});
+
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`);
+			}
+
+			const updatedRoles = await response.json();
+			console.log('Role deleted successfully:', updatedRoles);
+
+			// Dispatch the event with the updated roles
+			dispatch('rolesupdated', { roles: updatedRoles });
+		} catch (error) {
+			console.error('Error deleting role:', error);
+			// Optionally, show an error message to the user
+		}
+	}
 
 
 	async function createRole() {
@@ -26,7 +58,6 @@
 			// Optionally, show an error message to the user
 			return;
 		}
-
 
 		try {
 			const response = await fetch('/role', {
@@ -72,18 +103,40 @@
 		}
 	}
 </script>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+<div class="flex flex-wrap justify-center gap-6 items-stretch">
     {#each roles as role}
-        <div class="p-4 bg-gray-100 rounded-lg shadow">
-            <h2 class="font-semibold flex items-center">
-                {role.name}
-                {#if role.is_default}
-                    <span class="ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        Default
-                    </span>
-                {/if}
-            </h2>
-            <p>Hierarchy Level: {role.hierarchy_level}</p>
+        <div class="block w-full md:w-1/2 lg:w-1/3 p-4 relative group">
+            <div class="bg-gray-100 shadow-lg rounded-lg p-6 transition duration-150 ease-in-out hover:shadow-xl cursor-default h-full flex flex-col">
+                <!-- Edit Icon -->
+                <button
+                        on:click={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            handleEdit(role.id);
+                        }}
+                        class="focus:outline-none hover:bg-blue-200 p-1 rounded-md absolute top-6 right-6"
+                        title="Edit Role"
+                >
+                    <Icon src={Pencil} class="w-4 h-4 text-blue-500"/>
+                </button>
+                <!-- Delete Icon -->
+                <button
+                        on:click={(event) => {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            handleDelete(role.id);
+                        }}
+                        class="focus:outline-none hover:bg-red-200 p-1 rounded-md absolute top-6 right-12"
+                        title="Delete Role"
+                >
+                    <Icon src={Trash2} class="w-4 h-4 text-red-500"/>
+                </button>
+                <h2 class="text-xl font-semibold text-blue-600 mb-2">{role.name}</h2>
+                <p class="text-gray-600 mb-4 flex-grow">
+                    Hierarchy Level: {role.hierarchy_level}
+                </p>
+            </div>
         </div>
     {/each}
 </div>

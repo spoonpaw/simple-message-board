@@ -6,6 +6,8 @@ import {getPermissionsByUserId} from "$lib/server/db/queries/permissions/getPerm
 import type {Role} from "$lib/shared";
 import {insertRole} from "$lib/server/db/queries/roles/insertRole";
 import {getAllRoles} from "$lib/server/db/queries/roles/getAllRoles";
+import {deleteRole} from "$lib/server/db/queries/roles/deleteRole";
+import {getUserCountByRoleId} from "$lib/server/db/queries/users/getUserCountByRoleId";
 
 export async function POST(requestEvent: RequestEvent) {
 	try {
@@ -38,7 +40,7 @@ export async function POST(requestEvent: RequestEvent) {
 		// Return success response
 		return new Response(JSON.stringify(allRoles), {
 			status: 200,
-			headers: { 'Content-Type': 'application/json' }
+			headers: {'Content-Type': 'application/json'}
 		});
 	} catch (error) {
 		console.error('Error handling role creation: ', error);
