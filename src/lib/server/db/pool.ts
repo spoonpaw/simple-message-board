@@ -13,3 +13,13 @@ export const pool = new Pool({
 		rejectUnauthorized: false // Required for Heroku
 	}
 });
+
+// this is the way to do it if you don't have a DATABASE_URL (local development)
+// Create a new pool instance with your database connection details
+// export const pool = new Pool({
+// 	user: env.DB_USER,
+// 	host: env.DB_HOST,
+// 	database: env.DB_NAME,
+// 	password: env.DB_PASSWORD,
+// 	port: parseInt(env.DB_PORT || '5432', 10)
+// });
