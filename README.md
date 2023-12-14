@@ -5,7 +5,7 @@ Simple Message Board is a lightweight, easy-to-use messaging platform built with
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+These instructions will guide you through getting a copy of the project up and running on your local machine for development and testing purposes, as well as deploying it to Heroku.
 
 ### Prerequisites
 
@@ -31,26 +31,7 @@ Before setting up the project, ensure you have the following installed:
    npm install
    ```
 
-4. Copy the example `.env` file and fill in the values. You'll need to set up an AWS S3 bucket and PostgreSQL database as described below:
-   ```
-   # Copy this file to '.env' and fill in the values.
-
-   # Database configuration
-   DB_USER=your_database_user
-   DB_HOST=your_database_host
-   DB_NAME=your_database_name
-   DB_PASSWORD=your_database_password
-   DB_PORT=your_database_port
-
-   # JWT secret key
-   JWT_SECRET=your_jwt_secret_key
-
-   # AWS S3 configuration
-   AWS_ACCESS_KEY_ID=your_aws_access_key_id
-   AWS_SECRET_ACCESS_KEY=your_aws_secret_access_key
-   AWS_REGION=your_aws_region
-   S3_BUCKET_NAME=your_s3_bucket_name
-   ```
+4. Copy the example `.env` file and fill in the values:
 
 ### AWS S3 Bucket Setup
 
@@ -64,8 +45,7 @@ Before setting up the project, ensure you have the following installed:
 2. Open your PostgreSQL client (e.g., pgAdmin or psql).
 3. Create a new database for your application.
 4. Run the SQL queries found in `migrations/init.sql` to set up the database schema.
-
-5. Set up your PostgreSQL database by running the SQL queries found in `migrations/init.sql`.
+5. For seeding the database, execute the SQL scripts in `migrations/seeds/`.
 
 ### Running the Application
 
@@ -77,7 +57,7 @@ npm run dev
 
 This will start the server and usually opens the app in a new browser tab. If it doesn't, you can manually visit [http://localhost:3000](http://localhost:3000) to view the application.
 
-## Building for Production
+### Building for Production
 
 To create a production build of your app, run:
 
@@ -91,7 +71,15 @@ After building, you can preview the production build with:
 npm run preview
 ```
 
-> Note: Depending on your deployment target, you may need to set up an [adapter](https://kit.svelte.dev/docs/adapters) as per SvelteKit documentation.
+### Deploying to Heroku
+
+1. Ensure you have the Heroku CLI installed and are logged in.
+2. Create a Heroku app with `heroku create`.
+3. Set up environment variables on Heroku using `heroku config:set`.
+4. Deploy your application using `git push heroku master`.
+5. Run database migrations on Heroku as needed.
+
+> Note: For specific Heroku deployment steps and configurations, refer to the deployment section of the SvelteKit documentation.
 
 ## License
 
