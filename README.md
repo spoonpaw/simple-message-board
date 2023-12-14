@@ -5,7 +5,7 @@ Simple Message Board is a user-friendly and efficient forum platform developed w
 
 The platform utilizes PostgreSQL for robust and structured data management, which accommodates various features essential for a forum, such as user profiles, permissions, and discussion threads. The interface, styled with Tailwind CSS, offers a clean and responsive layout, making it accessible and easy to navigate for users.
 
-Simple Message Board aims to provide a straightforward yet effective solution for online communities to engage, discuss, and share ideas in a collaborative space.
+Simple Message Board aims to provide a straightforward yet effective solution for online communities to engage, discuss, and share ideas in a collaborative space. Experience the Simple Message Board in action [here](https://simple-message-board-76c0cbb8f187.herokuapp.com/).
 
 ## Getting Started
 
