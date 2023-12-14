@@ -1,6 +1,7 @@
 // src/lib/db/pool.ts
-import { Pool } from 'pg';
 import { env } from '$env/dynamic/private'; // Import the env from SvelteKit's env module
+import pkg from 'pg';
+const { Pool } = pkg;
 
 // Create a new pool instance with your database connection details
 export const pool = new Pool({
