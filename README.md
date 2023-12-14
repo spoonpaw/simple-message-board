@@ -85,6 +85,11 @@ npm run preview
 
 > Note: For specific Heroku deployment steps and configurations, refer to the deployment section of the SvelteKit documentation.
 
+## TODOs
+
+- Implement account verification via email.
+- Implement account recovery via email.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
