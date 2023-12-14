@@ -35,7 +35,7 @@ CREATE TABLE users (
     last_login TIMESTAMP WITH TIME ZONE,
     confirmation_token UUID DEFAULT uuid_generate_v4(),
     is_confirmed BOOLEAN DEFAULT FALSE,
-    profile_image_url VARCHAR(255) DEFAULT 'https://simplemessageboard-images.s3.us-west-1.amazonaws.com/default_avatar.png',
+    profile_image_url VARCHAR(255) DEFAULT 'https://simplemessageboard-images.s3.us-west-1.amazonaws.com/avatars/default_avatar.png',
     bio TEXT,
     banned BOOLEAN DEFAULT FALSE
 );
