@@ -1,7 +1,11 @@
 
 # Simple Message Board
 
-Simple Message Board is a lightweight, easy-to-use messaging platform built with Svelte. This project allows users to post and view messages in a simple, clean interface.
+Simple Message Board is a user-friendly and efficient forum platform developed with SvelteKit. It's designed to support community interactions and discussions in an organized manner. By integrating TypeScript, the project gains enhanced code clarity and reliability, contributing to a more manageable development process.
+
+The platform utilizes PostgreSQL for robust and structured data management, which accommodates various features essential for a forum, such as user profiles, permissions, and discussion threads. The interface, styled with Tailwind CSS, offers a clean and responsive layout, making it accessible and easy to navigate for users.
+
+Simple Message Board aims to provide a straightforward yet effective solution for online communities to engage, discuss, and share ideas in a collaborative space.
 
 ## Getting Started
 
