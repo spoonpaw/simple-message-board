@@ -12,23 +12,17 @@
 	export let canAccessAdminPanel: boolean;
 </script>
 
-<div class="flex space-x-4 ml-2">
-    <div class="text-lg text-gray-600">Hi {username}!</div>
+<div class="block inline text-right">
+    <div class="block md:inline-block text-lg text-gray-600 mr-2 md:mr-4 whitespace-normal">Hi {username}!</div>
     {#if isLoggedIn}
-        {#if canAccessAdminPanel}  <!-- Conditionally render AdminButton -->
-            <div>
+        <div class="block md:inline text-right">
+            {#if canAccessAdminPanel}
                 <AdminButton/>
-            </div>
-        {/if}
-        <div>
+            {/if}
             <UserProfileButton {userId}/>
-        </div>
-        <div>
             <LogoutButton/>
         </div>
     {:else}
-        <div>
-            <LoginButton/>
-        </div>
+        <LoginButton/>
     {/if}
 </div>
