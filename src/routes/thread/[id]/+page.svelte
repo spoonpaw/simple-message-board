@@ -371,7 +371,7 @@
                     <!-- Content and Quoted Posts with responsive design -->
                     <div class="overflow-auto ml-5 mr-5 mt-4 w-auto">
                         {#if post.quotedPost}
-                            <div class="post-content w-auto overflow-x-auto bg-gray-100 p-2 border-l-4 border-blue-500">
+                            <div class="post-content">
                                 {@html renderQuotedPost(post.quotedPost)}
                             </div>
                         {/if}
