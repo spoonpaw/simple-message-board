@@ -371,12 +371,11 @@
                     <!-- Content and Quoted Posts with responsive design -->
                     <div class="overflow-auto ml-5 mr-5 mt-4 w-auto">
                         {#if post.quotedPost}
-                            <!-- Display quoted post content in a container that adjusts to content -->
-                            <div class="w-auto overflow-x-auto bg-gray-100 p-2 border-l-4 border-blue-500">
+                            <div class="post-content w-auto overflow-x-auto bg-gray-100 p-2 border-l-4 border-blue-500">
                                 {@html renderQuotedPost(post.quotedPost)}
                             </div>
                         {/if}
-                        <div>{@html post.content}</div>
+                        <div class="post-content">{@html post.content}</div>
                     </div>
                 </div>
             {/each}
@@ -480,3 +479,17 @@
         </div>
     </Modal>
 {/if}
+
+<style lang="postcss">
+    :global(.post-content a) {
+        color: #007bff; /* Classic hyperlink blue */
+        text-decoration: underline; /* Underline for hyperlinks */
+        cursor: pointer;
+    }
+
+    :global(.post-content a:hover),
+    :global(.post-content a:focus) {
+        color: #0056b3; /* Darker shade of blue for hover and focus states */
+        text-decoration: none; /* Optionally remove underline on hover/focus */
+    }
+</style>
