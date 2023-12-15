@@ -33,12 +33,12 @@
 			theme: 'snow',
 			modules: {
 				toolbar: [
-					['bold', 'italic', 'underline', 'strike'],
-					['blockquote', 'code-block'],
-					[{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-					[{'list': 'ordered'}, {'list': 'bullet'}],
-					['link', 'image'],
-					['clean']
+					['bold', 'italic', 'underline', 'strike'],            // Text formatting
+					[{ 'header': [1, 2, 3, 4, 5, 6, false] }],            // Headers
+					[{'list': 'ordered'}, {'list': 'bullet'}],            // Lists
+					['blockquote', 'code-block'],                         // Blocks
+					['link', 'image'],                                    // Media and Links
+					['clean']                                             // Clean-up tool
 				],
 				imageUploader: {
 					upload: (file: File) => {
