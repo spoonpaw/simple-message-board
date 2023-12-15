@@ -1,6 +1,8 @@
 // src/routes/user/[id]/$types.d.ts
 
 // Represents the data of the user profile being viewed
+import type {Role} from "$lib/shared";
+
 export interface UserProfile {
 	username: string;
 	email: string;
@@ -12,6 +14,8 @@ export interface UserProfile {
 	hierarchyLevel: number | null;
 	id: string;
 	banned: boolean;
+	role: Role | null;
+	postCount: number;
 	// Include other properties specific to the user profile as needed
 }
 
@@ -23,4 +27,5 @@ export interface PageData {
 	authenticatedUsername: string; // The username of the authenticated user, if any
 	authenticatedUserHierarchyLevel: number | null; // The hierarchy level of the authenticated user, if any
 	permissions: Permission[];
+	roles: Role[];
 }

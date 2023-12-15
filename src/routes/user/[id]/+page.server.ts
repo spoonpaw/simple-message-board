@@ -7,6 +7,9 @@ import {getPermissionsByUserId} from "$lib/server/db/queries/permissions/getPerm
 import { getHierarchyLevelByUserId } from "$lib/server/db/queries/users/getHierarchyLevelByUserId"; // Import the new function
 import type { Permission } from '$lib/shared';
 import {getUserById} from "$lib/server/db/queries/users/getUserById";
+import {getRoleByUserId} from "$lib/server/db/queries/users/getRoleByUserId";
+import {getAllRoles} from "$lib/server/db/queries/roles/getAllRoles";
+import {getPostCountByUserId} from "$lib/server/db/queries/users/getPostCountByUserId";
 
 export async function load(requestEvent: RequestEvent) {
 	const {id} = requestEvent.params;
@@ -34,9 +37,14 @@ export async function load(requestEvent: RequestEvent) {
 	}
 
     requestedUserHierarchyLevel = await getHierarchyLevelByUserId(id);
+    const role = await getRoleByUserId(id);
 
 	// Check if the authenticated user is viewing their own profile
 	const isOwnProfile = authenticatedUser && authenticatedUser.id === id;
+
+	const roles = await getAllRoles();
+
+	const postCount = await getPostCountByUserId(id);
 
 	return {
 		userProfile: {
@@ -49,13 +57,15 @@ export async function load(requestEvent: RequestEvent) {
             hierarchyLevel: requestedUserHierarchyLevel, // Add hierarchy level here
 			isOwnProfile,
 			id: userProfile.id,
-			banned: userProfile.banned
-			// other user details...
+			banned: userProfile.banned,
+			role,
+			postCount
 		},
 		isAuthenticated: !!authenticatedUser,
 		authenticatedUserId: authenticatedUser ? authenticatedUser.id : null,
 		authenticatedUsername: authenticatedUser ? authenticatedUser.username : 'Anonymous',
         authenticatedUserHierarchyLevel, // Pass hierarchy level of authenticated user
-		permissions: permissions
+		permissions: permissions,
+		roles
 	};
 }

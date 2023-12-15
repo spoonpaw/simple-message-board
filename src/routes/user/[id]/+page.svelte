@@ -23,11 +23,59 @@
 	let newEmail = '';
 	let emailChangeWarningMessage = '';
 
+	let showAssignRoleModal = false;
+	let selectedRoleId: string | undefined; // This will be bound to the dropdown
+
 	// Reactive statements to handle changes in data
 	$: banned = data.userProfile.banned;
 	$: canAccessAdminPanel = data.permissions.some((permission) => permission.name === 'access_admin_panel');
 	$: canBanUsersOfLowerRole = data.permissions.some((permission) => permission.name === 'ban_user_lower_role');
 	$: canViewEmails = data.permissions.some((permission) => permission.name === 'view_user_emails');
+	$: canAssignRoles = data.permissions.some((permission) => permission.name === 'assign_roles');
+
+	function openAssignRoleModal() {
+		console.log(`Assign roles button clicked for user ID ${data.userProfile.id}`);
+		selectedRoleId = data.userProfile.role?.id; // Preselect the current user's role
+		showAssignRoleModal = true;
+	}
+
+	function closeAssignRoleModal() {
+		console.log('Assign roles modal closed');
+		showAssignRoleModal = false;
+	}
+
+	async function handleSubmitAssignRole(event: Event) {
+		event.preventDefault();
+
+		const selectedRole = data.roles.find(role => role.id === selectedRoleId);
+		console.log(`Role ID ${selectedRoleId} (named ${selectedRole?.name}) assigned to user ID ${data.userProfile.id}`);
+
+		try {
+			const response = await fetch(`/user/${data.userProfile.id}/assign-role`, {
+				method: 'PUT',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({roleId: selectedRoleId})
+			});
+
+			const result = await response.json();
+
+			if (response.ok) {
+				console.log('Server response:', result);
+				if (result.role) {
+					data.userProfile.role = result.role; // Update the role in the userProfile
+					console.log('Role updated to:', data.userProfile.role);
+				}
+			} else {
+				console.error('Error assigning role:', result.message || 'Unknown error');
+				// Optionally, show an error message to the user
+			}
+		} catch (error) {
+			console.error('Error sending request to server:', error);
+			// Optionally, show an error message to the user
+		}
+
+		closeAssignRoleModal();
+	}
 
 	function openEmailChangeModal() {
 		showEmailChangeModal = true;
@@ -317,6 +365,21 @@
                     <!-- User information -->
                     <p class="text-3xl text-gray-800 font-semibold">{data.userProfile.username}</p>
 
+                    <div class="flex items-center">
+                        <p class="text-lg font-semibold text-black-600 mr-2">
+                            Role: {data?.userProfile?.role?.name || 'No role assigned'}
+                        </p>
+                        {#if canAssignRoles}
+                            <button
+                                    class="text-blue-500 hover:text-blue-700"
+                                    on:click={openAssignRoleModal}
+                                    title="Edit Role"
+                            >
+                                <Icon src={Pencil} class="w-5 h-5"/>
+                            </button>
+                        {/if}
+                    </div>
+
                     <!-- Email address section with conditional pencil icon for editing -->
                     <div class="flex items-center">
                         {#if data.userProfile.isOwnProfile || canViewEmails}
@@ -336,6 +399,9 @@
                     <!-- Account details section -->
                     <div class="mt-4">
                         <h2 class="text-xl font-semibold text-gray-800">Account Details</h2>
+                        <p class="text-md text-gray-600">
+                            Post count: {data.userProfile.postCount}
+                        </p>
                         <p class="text-md text-gray-600">
                             Member since: {formatDate(data.userProfile.createdAt)}
                         </p>
@@ -487,4 +553,44 @@
         </div>
     </Modal>
 
+{/if}
+
+{#if canAssignRoles}
+    <!-- Assign Role Modal -->
+    <Modal open={showAssignRoleModal} title="Assign Role" on:close={closeAssignRoleModal}>
+        <div slot="body">
+            <form on:submit|preventDefault={handleSubmitAssignRole} class="space-y-4">
+                <select
+                        bind:value={selectedRoleId}
+                        class="w-full p-2 border rounded"
+                        required
+                >
+                    {#each data.roles as role}
+                        <option value={role.id} selected={role.id === data?.userProfile?.role?.id}>
+                            {role.name}
+                        </option>
+                    {/each}
+                </select>
+
+                <!-- Button Container -->
+                <div class="flex justify-between pt-4">
+                    <!-- Cancel Button -->
+                    <button
+                            type="button"
+                            class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-700 transition duration-300"
+                            on:click={closeAssignRoleModal}
+                    >
+                        Cancel
+                    </button>
+                    <!-- Submit Button -->
+                    <button
+                            type="submit"
+                            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition duration-300"
+                    >
+                        Assign Role
+                    </button>
+                </div>
+            </form>
+        </div>
+    </Modal>
 {/if}
