@@ -23,7 +23,7 @@ export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
 	try {
 		// Check if the user exists and fetch the banned status
 		const result = await client.query(
-			'SELECT id, username, password_hash, banned FROM users WHERE username = $1',
+			'SELECT id, username, password_hash, banned, is_confirmed FROM users WHERE username = $1',
 			[username]
 		);
 
@@ -45,9 +45,16 @@ export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
 			client.release();
 			return new Response(JSON.stringify({error: 'User is banned.'}), {
 				status: 403,
-				headers: {
-					'Content-Type': 'application/json'
-				}
+				headers: {'Content-Type': 'application/json'}
+			});
+		}
+
+		// Check if the account is confirmed
+		if (!user.is_confirmed) {
+			client.release();
+			return new Response(JSON.stringify({error: 'Account is not confirmed. Please check your email.'}), {
+				status: 401,
+				headers: {'Content-Type': 'application/json'}
 			});
 		}
 

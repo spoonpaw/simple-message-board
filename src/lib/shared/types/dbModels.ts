@@ -13,6 +13,11 @@ export interface User {
 	profile_image_url: string;
 	bio?: string; // Optional bio field
 	banned: boolean;
+	reset_token: string | null;
+	reset_token_expiry: Date | null;
+	new_email: string | null;
+	email_change_token: string | null;
+	email_change_token_expiry: Date | null;
 }
 
 export interface Role {

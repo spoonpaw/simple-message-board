@@ -29,6 +29,9 @@ CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     username VARCHAR(255) UNIQUE NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
+    new_email VARCHAR(255) UNIQUE,
+    email_change_token UUID,
+    email_change_token_expiry TIMESTAMP WITH TIME ZONE,
     password_hash TEXT NOT NULL,
     role_id UUID REFERENCES roles(id) ON DELETE SET NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -37,7 +40,9 @@ CREATE TABLE users (
     is_confirmed BOOLEAN DEFAULT FALSE,
     profile_image_url VARCHAR(255) DEFAULT 'https://simplemessageboard-images.s3.us-west-1.amazonaws.com/avatars/default_avatar.png',
     bio TEXT,
-    banned BOOLEAN DEFAULT FALSE
+    banned BOOLEAN DEFAULT FALSE,
+    reset_token UUID,
+    reset_token_expiry TIMESTAMP WITH TIME ZONE
 );
 
 -- Categories Table

@@ -30,6 +30,11 @@
             errorMessage.set('There was a problem submitting the form.');
         }
     }
+
+    // Function to handle "Forgot Password" click
+    function forgotPassword() {
+        goto('/forgot-password'); // Navigate to the forgot password page
+    }
 </script>
 
 <svelte:head>
@@ -79,12 +84,26 @@
                 </button>
             </form>
         </div>
-        <div class="text-sm font-medium text-center text-gray-500">
-            Don't have an account?
-            <a href="/register" class="text-indigo-600 hover:text-indigo-500">Register</a>
+        <div class="text-sm font-medium text-center text-gray-500 space-y-2">
+            <div>
+                Don't have an account?
+                <a href="/register" class="text-indigo-600 hover:text-indigo-500">Register</a>
+            </div>
+            <div>
+                <button
+                        class="text-indigo-600 hover:text-indigo-500"
+                        on:click={forgotPassword}>
+                    Forgot Password?
+                </button>
+            </div>
+            <div>
+                <a href="/" class="flex items-center justify-center text-indigo-600 hover:text-indigo-500">
+                    <span class="mr-1 mb-1">←</span>
+                    Back to Home
+                </a>
+            </div>
+
         </div>
-        <div class="text-sm font-medium text-center text-gray-500">
-            <a href="/" class="text-indigo-600 hover:text-indigo-500">← Back to Home</a>
-        </div>
+
     </div>
 </div>

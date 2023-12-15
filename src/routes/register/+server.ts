@@ -1,20 +1,17 @@
 // src/routes/register/+server.ts
 
-import type { RequestEvent, RequestHandler } from '@sveltejs/kit';
-import { pool } from '$lib/server';
+import type {RequestEvent, RequestHandler} from '@sveltejs/kit';
+import {pool} from '$lib/server';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { env } from '$env/dynamic/private';
-import { dev } from '$app/environment';
-import cookie from 'cookie';
 import validator from 'validator';
+import {sendEmail} from "$lib/server/email/sendEmail";
 
 export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
-	const { username, email, password } = await requestEvent.request.json();
+	const {username, email, password} = await requestEvent.request.json();
 
 	// Validate email address format
 	if (!validator.isEmail(email)) {
-		return new Response(JSON.stringify({ error: 'Invalid email address.' }), {
+		return new Response(JSON.stringify({error: 'Invalid email address.'}), {
 			status: 400,
 			headers: {
 				'Content-Type': 'application/json'
@@ -24,6 +21,7 @@ export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
 
 	// Start a new client connection from the pool
 	const client = await pool.connect();
+	await client.query('BEGIN'); // Start transaction
 
 	try {
 		// Check if email/username exists
@@ -35,8 +33,9 @@ export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
 		const userExistsRowCount = userExists.rowCount ?? 0;
 
 		if (userExistsRowCount > 0) {
+			await client.query('ROLLBACK'); // Rollback transaction
 			client.release();
-			return new Response(JSON.stringify({ error: 'Username or email already exists.' }), {
+			return new Response(JSON.stringify({error: 'Username or email already exists.'}), {
 				status: 409,
 				headers: {
 					'Content-Type': 'application/json'
@@ -54,13 +53,9 @@ export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
 		if ((defaultRoleResult.rowCount ?? 0) > 0) {
 			roleId = defaultRoleResult.rows[0].id;
 		} else {
-			// Handle the case where no default role is found
-			// Option 1: Set a specific fallback role ID
-			// roleId = 'your-fallback-role-id';
-
-			// Option 2: Abort registration with an error message
+			await client.query('ROLLBACK');
 			client.release();
-			return new Response(JSON.stringify({ error: 'No default role set in the system.' }), {
+			return new Response(JSON.stringify({error: 'No default role set in the system.'}), {
 				status: 500,
 				headers: {
 					'Content-Type': 'application/json'
@@ -68,43 +63,48 @@ export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
 			});
 		}
 
-		// Insert the new user into the database with the determined role
+		// Insert the new user into the database
 		const insertResult = await client.query(
-			'INSERT INTO users (username, email, password_hash, role_id) VALUES ($1, $2, $3, $4) RETURNING id, username',
+			'INSERT INTO users (username, email, password_hash, role_id) VALUES ($1, $2, $3, $4) RETURNING id, username, confirmation_token',
 			[username, email, passwordHash, roleId]
 		);
 		const newUser = insertResult.rows[0];
 
-		// Immediately log in the user by generating a JWT token
-		const JWT_SECRET = env.JWT_SECRET || 'your-secret-should-not-be-here';
-		const token = jwt.sign(
-			{ userId: newUser.id, username: newUser.username },
-			JWT_SECRET,
-			{ expiresIn: '1h' } // Token expires in 1 hour
-		);
+		// Construct the confirmation link
+		const protocol = requestEvent.url.protocol;
+		const host = requestEvent.url.host;
+		const confirmationLink = `${protocol}//${host}/confirm/${newUser.confirmation_token}`;
 
-		// Set the httpOnly cookie
-		const serializedCookie = cookie.serialize('token', token, {
-			httpOnly: true,
-			maxAge: 60 * 60, // 1 hour
-			path: '/',
-			sameSite: 'strict',
-			secure: !dev // Use secure cookies in production
-		});
+		try {
+			await sendEmail({
+				from: 'no-reply@netartisancollective.com',
+				to: email,
+				subject: 'Confirm your Net Artisan Collective Account',
+				text: `Please confirm your account by clicking on this link: ${confirmationLink}`,
+				html: `<p>Please confirm your account by clicking on this link: <a href="${confirmationLink}">${confirmationLink}</a></p>`
+			});
+		} catch (emailError) {
+			console.error('Email sending error:', emailError);
+			await client.query('ROLLBACK'); // Rollback if email sending fails
+			client.release();
+			return new Response(JSON.stringify({error: 'Failed to send confirmation email.'}), {
+				status: 500,
+				headers: {'Content-Type': 'application/json'}
+			});
+		}
 
+		await client.query('COMMIT'); // Commit transaction
 		client.release();
-		return new Response(JSON.stringify({ message: 'User created successfully.', user: newUser }), {
+		return new Response(JSON.stringify({message: 'Registration successful! Please check your email to confirm your account.'}), {
 			status: 201,
-			headers: {
-				'Content-Type': 'application/json',
-				'Set-Cookie': serializedCookie
-			}
+			headers: {'Content-Type': 'application/json'}
 		});
 
 	} catch (error) {
 		console.error('Database error:', error);
+		await client.query('ROLLBACK');
 		client.release();
-		return new Response(JSON.stringify({ error: 'Failed to create user.' }), {
+		return new Response(JSON.stringify({error: 'Failed to create user.'}), {
 			status: 500,
 			headers: {
 				'Content-Type': 'application/json'

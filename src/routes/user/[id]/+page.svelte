@@ -6,6 +6,8 @@
 	import {ArrowLeftCircle, Pencil} from '@steeze-ui/lucide-icons';
 	import UserStatusHeader from '$lib/client/components/userStatusHeader/UserStatusHeader.svelte';
 	import Modal from '$lib/client/components/common/Modal.svelte';
+	import {toastManager} from "../../../stores/toastManager";
+	import ToastContainer from "$lib/client/components/common/ToastContainer.svelte";
 
 	export let data: PageData;
 
@@ -16,6 +18,9 @@
 	let showBioModal = false;
 	let editedBio = data.userProfile.bio;
 	let bioWarningMessage = '';
+	let showEmailChangeModal = false;
+	let newEmail = '';
+	let emailChangeWarningMessage = '';
 
 	// Reactive statements to handle changes in data
 	$: banned = data.userProfile.banned;
@@ -23,13 +28,61 @@
 	$: canBanUsersOfLowerRole = data.permissions.some((permission) => permission.name === 'ban_user_lower_role');
 	$: canViewEmails = data.permissions.some((permission) => permission.name === 'view_user_emails');
 
+	function openEmailChangeModal() {
+		showEmailChangeModal = true;
+		emailChangeWarningMessage = ''; // Reset the warning message when the modal opens
+	}
+
+	function closeEmailChangeModal() {
+		showEmailChangeModal = false;
+		emailChangeWarningMessage = ''; // Reset the warning message when the modal closes
+	}
+
+	async function handleSubmitNewEmail(event: Event) {
+		event.preventDefault();
+		try {
+			const response = await fetch('/change-email', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ newEmail, userId: data.userProfile.id })
+			});
+
+			const responseData = await response.json();
+
+			if (response.ok) {
+				console.log('Server response:', responseData);
+				closeEmailChangeModal(); // Close modal after successful submission
+				toastManager.addToast({
+					message: responseData.message || 'Email change requested successfully. Please check your new email for a confirmation link.',
+					type: 'success',
+					duration: 3000
+				});
+			} else {
+				emailChangeWarningMessage = responseData.error || 'Error changing email. Please try again.';
+				toastManager.addToast({
+					message: emailChangeWarningMessage,
+					type: 'error',
+					duration: 3000
+				});
+			}
+		} catch (error) {
+			console.error('Error changing email:', error);
+			emailChangeWarningMessage = 'Error changing email. Please try again.';
+			toastManager.addToast({
+				message: emailChangeWarningMessage,
+				type: 'error',
+				duration: 3000
+			});
+		}
+	}
+
 	async function updateBanStatus(ban: boolean): Promise<void> {
 		console.log(`Updating ban status to ${ban} for user ID: ${data.userProfile.id}`);
 		try {
 			const response = await fetch(`/user/${data.userProfile.id}/ban`, {
 				method: 'PUT',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ ban })
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({ban})
 			});
 
 			console.log('Response received:', response);
@@ -42,7 +95,7 @@
 			console.log('Response JSON:', result);
 
 			if (result.userProfile) {
-				data.userProfile = { ...data.userProfile, ...result.userProfile };
+				data.userProfile = {...data.userProfile, ...result.userProfile};
 				banned = result.userProfile.banned; // Update the banned reactive variable
 				console.log('Updated user profile:', data.userProfile);
 			}
@@ -193,6 +246,8 @@
     <title>User Profile - {data.userProfile.username}</title>
 </svelte:head>
 
+<ToastContainer/>
+
 <div class="min-h-screen bg-gray-50">
     <div class="container mx-auto py-8 px-4 sm:px-0">
         <div class="flex justify-between items-center mb-6">
@@ -266,9 +321,21 @@
                     <!-- User information -->
                     <p class="text-3xl text-gray-800 font-semibold">{data.userProfile.username}</p>
 
-                    {#if data.userProfile.isOwnProfile || canViewEmails}
-                        <p class="text-md text-gray-600">{data.userProfile.email}</p>
-                    {/if}
+                    <!-- Email address section with conditional pencil icon for editing -->
+                    <div class="flex items-center">
+                        {#if data.userProfile.isOwnProfile || canViewEmails}
+                            <p class="text-md text-gray-600 mr-2">{data.userProfile.email}</p>
+                            {#if data.userProfile.isOwnProfile}
+                                <button
+                                        class="text-blue-500 hover:text-blue-700 font-bold flex items-center"
+                                        on:click={openEmailChangeModal}
+                                        title="Edit Email"
+                                >
+                                    <Icon src={Pencil} class="w-5 h-5"/>
+                                </button>
+                            {/if}
+                        {/if}
+                    </div>
 
                     <!-- Account details section -->
                     <div class="mt-4">
@@ -387,4 +454,41 @@
             </form>
         </div>
     </Modal>
+
+    <!-- Email Change Modal -->
+    <Modal open={showEmailChangeModal} title="Change Email" on:close={closeEmailChangeModal}>
+        <div slot="body">
+            <form on:submit|preventDefault={handleSubmitNewEmail} class="space-y-4">
+                <input
+                        type="email"
+                        bind:value={newEmail}
+                        class="w-full p-2 border rounded"
+                        placeholder="Enter new email address"
+                        required
+                />
+                {#if emailChangeWarningMessage}
+                    <p class="text-red-500 text-sm">{emailChangeWarningMessage}</p>
+                {/if}
+                <!-- Button Container -->
+                <div class="flex justify-between pt-4">
+                    <!-- Cancel Button -->
+                    <button
+                            type="button"
+                            class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-700 transition duration-300"
+                            on:click={closeEmailChangeModal}
+                    >
+                        Cancel
+                    </button>
+                    <!-- Submit Button -->
+                    <button
+                            type="submit"
+                            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition duration-300"
+                    >
+                        Change Email
+                    </button>
+                </div>
+            </form>
+        </div>
+    </Modal>
+
 {/if}
