@@ -225,7 +225,7 @@
 		const serializedContent = root.toString();
 
 		return `
-        <div class="bg-gray-100 p-2 border-l-4 border-blue-500 mb-2 w-auto">
+        <div class="post-content bg-gray-100 p-2 border-l-4 border-blue-500 mb-2 w-auto">
             <div class="text-sm font-medium">
                 <a href="/user/${quotedPost.authorId}" class="text-blue-600 hover:text-blue-800 hover:underline">@${quotedPost.authorUsername}</a>
             </div>
@@ -371,9 +371,7 @@
                     <!-- Content and Quoted Posts with responsive design -->
                     <div class="overflow-auto ml-5 mr-5 mt-4 w-auto">
                         {#if post.quotedPost}
-                            <div class="post-content">
-                                {@html renderQuotedPost(post.quotedPost)}
-                            </div>
+                            {@html renderQuotedPost(post.quotedPost)}
                         {/if}
                         <div class="post-content">{@html post.content}</div>
                     </div>
