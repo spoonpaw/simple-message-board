@@ -3,11 +3,12 @@
 <script lang="ts">
 	import type {PageData} from './$types';
 	import {Icon} from '@steeze-ui/svelte-icon';
-	import {ArrowLeftCircle, Pencil} from '@steeze-ui/lucide-icons';
-	import UserStatusHeader from '$lib/client/components/userStatusHeader/UserStatusHeader.svelte';
+	import {Home, Pencil} from '@steeze-ui/lucide-icons';
 	import Modal from '$lib/client/components/common/Modal.svelte';
 	import {toastManager} from "../../../stores/toastManager";
 	import ToastContainer from "$lib/client/components/common/ToastContainer.svelte";
+	import Navbar from "$lib/client/components/common/Navbar.svelte";
+	import {goto} from "$app/navigation";
 
 	export let data: PageData;
 
@@ -43,8 +44,8 @@
 		try {
 			const response = await fetch('/change-email', {
 				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ newEmail, userId: data.userProfile.id })
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({newEmail, userId: data.userProfile.id})
 			});
 
 			const responseData = await response.json();
@@ -138,10 +139,6 @@
 			console.error('Error updating bio:', error);
 			bioWarningMessage = 'Error updating bio';
 		}
-	}
-
-	function navigateBack(): void {
-		window.history.back();
 	}
 
 	function changeAvatarClicked(): void {
@@ -240,6 +237,10 @@
 			minute: '2-digit'
 		});
 	}
+
+	function navigateToHome() {
+		goto('/');
+	}
 </script>
 
 <svelte:head>
@@ -250,21 +251,16 @@
 
 <div class="min-h-screen bg-gray-50">
     <div class="container mx-auto py-8 px-4 sm:px-0">
-        <div class="flex justify-between items-center mb-6">
-            <button
-                    on:click={navigateBack}
-                    class="text-blue-500 hover:text-blue-700 font-bold flex items-center"
-            >
-                <Icon src={ArrowLeftCircle} class="w-5 h-5 mr-1 align-text-bottom flex-shrink-0"/>
-                Back
-            </button>
-            <UserStatusHeader
-                    isLoggedIn={data.isAuthenticated}
-                    username={data.authenticatedUsername}
-                    userId={data.authenticatedUserId ?? ''}
-                    canAccessAdminPanel={canAccessAdminPanel}
-            />
-        </div>
+        <!-- Navbar Component -->
+        <Navbar
+                iconSrc={Home}
+                text="Home"
+                onIconClick={navigateToHome}
+                isLoggedIn={data.isAuthenticated}
+                username={data.authenticatedUsername}
+                userId={data.authenticatedUserId ?? ''}
+                canAccessAdminPanel={canAccessAdminPanel}
+        />
 
         <div class="bg-white shadow-lg rounded-lg p-6 mb-6">
             <h1 class="text-3xl font-semibold text-gray-800 mb-4">User Profile</h1>

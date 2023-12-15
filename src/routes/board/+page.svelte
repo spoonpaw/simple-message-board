@@ -6,9 +6,9 @@
 	import {goto} from '$app/navigation';
 	import {Icon} from '@steeze-ui/svelte-icon';
 	import {Home, Pencil, Trash2} from '@steeze-ui/lucide-icons';
-	import UserStatusHeader from '$lib/client/components/userStatusHeader/UserStatusHeader.svelte';
 	import Modal from "$lib/client/components/common/Modal.svelte";
 	import {fade} from 'svelte/transition';
+	import Navbar from "$lib/client/components/common/Navbar.svelte";
 
 	export let data: PageServerData;
 	let username = data.username;
@@ -214,20 +214,19 @@
 
 <div class="min-h-screen bg-gray-50">
     <div class="container mx-auto py-8 px-4 sm:px-0">
-        <div class="flex justify-between items-center mb-6">
-            <div>
-                <button
-                        on:click={navigateToHome}
-                        class="text-blue-500 hover:text-blue-700 font-bold flex items-center"
-                >
-                    <Icon src={Home} class="w-5 h-5 flex-shrink-0 mr-1 align-text-bottom"/>
-                    Home
-                </button>
+        <!-- Navbar Component -->
+        <Navbar
+            iconSrc={Home}
+            text="Home"
+            onIconClick={navigateToHome}
+            {isLoggedIn}
+            {username}
+            {canAccessAdminPanel}
+            userId={userid ?? ''}
+        />
 
-                <h1 class="text-3xl font-semibold text-gray-800 mt-2">Message Board</h1>
-            </div>
-            <UserStatusHeader {isLoggedIn} {username} {canAccessAdminPanel} userId={userid ?? ''}/>
-        </div>
+        <!-- Message Board Header -->
+        <h1 class="text-3xl font-semibold text-gray-800 mt-2 mb-6">Message Board</h1>
 
         {#if canCreateCategory}
             <div class="flex justify-end px-4">

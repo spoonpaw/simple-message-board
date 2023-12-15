@@ -5,11 +5,11 @@
 	import {goto} from '$app/navigation';
 	import {Icon} from '@steeze-ui/svelte-icon';
 	import {Pin, Lock, ArrowLeftCircle, Trash2, PinOff, Unlock} from '@steeze-ui/lucide-icons';
-	import UserStatusHeader from '$lib/client/components/userStatusHeader/UserStatusHeader.svelte';
 	import Modal from '$lib/client/components/common/Modal.svelte';
 	import type {ThreadCategoryView} from '$lib/shared';
 	import QuillEditor from '$lib/client/components/common/QuillEditor.svelte';
 	import {getTextFromHtml} from '$lib/shared/htmlUtils/getTextFromHtml';
+	import Navbar from "$lib/client/components/common/Navbar.svelte";
 
 	export let data: PageServerData;
 	const {username, userid, category, permissions} = data;
@@ -187,21 +187,18 @@
 
 <div class="min-h-screen bg-gray-50">
     <div class="container mx-auto py-8 px-4 sm:px-0">
-        <div class="flex justify-between items-center mb-6">
-            <div>
-                <button
-                        on:click={navigateToBoard}
-                        class="text-blue-500 hover:text-blue-700 font-bold flex items-center"
-                >
-                    <Icon src={ArrowLeftCircle} class="w-5 h-5 mr-1 align-text-bottom flex-shrink-0"/>
-                    Back to Main Board
-                </button>
+        <!-- Navbar Component -->
+        <Navbar
+            iconSrc={ArrowLeftCircle}
+            text="Back to Main Board"
+            onIconClick={navigateToBoard}
+            {isLoggedIn}
+            {username}
+            userId={userid ?? ''}
+            {canAccessAdminPanel}
+        />
 
                 <h1 class="text-3xl font-semibold text-gray-800 mt-2">Category: {category.title}</h1>
-            </div>
-
-            <UserStatusHeader {isLoggedIn} {username} userId={userid ?? ''} {canAccessAdminPanel}/>
-        </div>
         <p class="text-gray-600 mb-4">{category.description}</p>
         {#if isLoggedIn}
             <div class="flex justify-end px-4">

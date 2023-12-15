@@ -1,23 +1,19 @@
 <!--src/routes/admin/+page.svelte-->
 
 <script lang="ts">
-	import {Icon} from '@steeze-ui/svelte-icon';
-	import UserStatusHeader from '$lib/client/components/userStatusHeader/UserStatusHeader.svelte';
 	import RolesPanel from '$lib/client/components/adminPanel/RolesPanel.svelte';
 	import RolePermissionsPanel from '$lib/client/components/adminPanel/RolePermissionsPanel.svelte';
 	import type {PageServerData} from './$types';
-	import {ArrowLeftCircle} from "@steeze-ui/lucide-icons";
+	import {Home} from "@steeze-ui/lucide-icons";
 	import type {Role, RolePermission} from "$lib/shared";
+	import Navbar from "$lib/client/components/common/Navbar.svelte";
+	import {goto} from "$app/navigation";
 
 	export let data: PageServerData;
 
 	let {roles, permissions, rolePermissions, username, userid} = data;
 
 	let activeTab = 'roles';
-
-	function navigateBack(): void {
-		window.history.back();
-	}
 
 	function handlePermissionChange(event: CustomEvent<{ roleId: string; permissionId: string; newState: boolean }>) {
 		const { roleId, permissionId, newState } = event.detail;
@@ -48,6 +44,11 @@
 		console.log('Roles updated:', roles);
 	}
 
+
+	function navigateToHome() {
+		goto('/');
+	}
+
 </script>
 
 <svelte:head>
@@ -56,21 +57,19 @@
 
 <div class="min-h-screen bg-gray-50">
     <div class="container mx-auto py-8 px-4 sm:px-0">
-        <div class="flex justify-between items-center mb-6">
-            <button on:click={navigateBack} class="text-blue-500 hover:text-blue-700 font-bold flex items-center">
-                <Icon src={ArrowLeftCircle} class="w-5 h-5 mr-1 align-text-bottom flex-shrink-0"/>
-                Back
-            </button>
-            <UserStatusHeader
+        <!-- Navbar Component -->
+        <Navbar
+            iconSrc={Home}
+            text="Home"
+            onIconClick={navigateToHome}
                     isLoggedIn={true}
                     username={username}
                     userId={userid}
                     canAccessAdminPanel={true}
             />
-        </div>
 
         <div class="bg-white shadow-2xl rounded-3xl overflow-hidden">
-            <h1 class="text-4xl font-extrabold text-gray-800 px-6 py-4">
+            <h1 class="text-3xl font-semibold text-gray-800 px-6 py-4">
                 Admin Dashboard
             </h1>
             <div class="flex justify-center bg-gradient-to-r from-blue-500 to-teal-400 p-1 rounded-t-3xl">

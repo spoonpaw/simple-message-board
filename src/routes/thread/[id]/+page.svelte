@@ -6,11 +6,11 @@
 	import {Icon} from '@steeze-ui/svelte-icon';
 	import {ArrowLeftCircle, Lock, Pencil, Pin, Trash2, Quote} from '@steeze-ui/lucide-icons';
 	import Modal from '$lib/client/components/common/Modal.svelte';
-	import UserStatusHeader from '$lib/client/components/userStatusHeader/UserStatusHeader.svelte';
 	import QuillEditor from '$lib/client/components/common/QuillEditor.svelte';
 	import {getTextFromHtml} from '$lib/shared/htmlUtils/getTextFromHtml';
 	import {parse, HTMLElement} from 'node-html-parser';
 	import type {PostThreadView} from "$lib/shared/types/PostThreadView";
+	import Navbar from "$lib/client/components/common/Navbar.svelte";
 
 	export let data: PageServerData;
 	let {username, userid, thread, permissions} = data;
@@ -22,7 +22,6 @@
 	let editPostQuillEditor: QuillEditor;
 	let isOriginatingPost = false; // To track if the post being edited is the originating post
 	let currentThreadTitle = ''; // To hold the current thread title
-
 
 	// Variables for the new post Quill editor
 	let newPostModal = false; // Modal for submitting a new post
@@ -225,12 +224,17 @@
 		const serializedContent = root.toString();
 
 		return `
-        <div class="post-content bg-gray-100 p-2 border-l-4 border-blue-500 mb-2 w-auto">
-            <div class="text-sm font-medium">
-                <a href="/user/${quotedPost.authorId}" class="text-blue-600 hover:text-blue-800 hover:underline">@${quotedPost.authorUsername}</a>
+
+        <div class="flex flex-col w-full inner-div">
+            <div class="post-content p-2 border-l-4 border-blue-500 mb-2 max-w-full">
+                <div class="text-sm font-medium">
+                    <a href="/user/${quotedPost.authorId}" class="text-blue-600 hover:text-blue-800 hover:underline">
+                        @${quotedPost.authorUsername}
+                    </a>
+                </div>
+                <div class="text-sm text-gray-600 italic">${serializedContent}</div>
+                ${quotedPost.quotedPost ? renderQuotedPost(quotedPost.quotedPost) : ''}
             </div>
-            <div class="text-sm text-gray-600 italic">${serializedContent}</div>
-            ${quotedPost.quotedPost ? renderQuotedPost(quotedPost.quotedPost) : ''}
         </div>
     `;
 	}
@@ -248,28 +252,25 @@
 
 <div class="min-h-screen bg-gray-50">
     <div class="container mx-auto pt-8 px-4 sm:px-0">
-        <div class="flex justify-between items-center mb-6">
-            <div>
-                <button
-                        on:click={navigateToCategory}
-                        class="text-blue-500 hover:text-blue-700 font-bold flex items-center"
-                >
-                    <Icon src={ArrowLeftCircle} class="w-5 h-5 flex-shrink-0 mr-1 align-text-bottom"/>
-                    Back to Category: {thread.category_title}
-                </button>
+        <!-- Navbar Component -->
+        <Navbar
+                iconSrc={ArrowLeftCircle}
+                text={`Back to Category: ${thread.category_title}`}
+                onIconClick={navigateToCategory}
+                {isLoggedIn}
+                {username}
+                userId={userid ?? ''}
+                {canAccessAdminPanel}
+        />
 
-                <h1 class="text-3xl font-semibold text-gray-800 mt-2">Thread: {thread.title}</h1>
-                <div>
-                    {#if thread.pinned}
-                        <Icon src={Pin} class="inline-block w-5 h-5 mr-2"/>
-                    {/if}
-                    {#if thread.locked}
-                        <Icon src={Lock} class="inline-block w-5 h-5 mr-2"/>
-                    {/if}
-                </div>
-            </div>
-
-            <UserStatusHeader {isLoggedIn} {username} userId={userid ?? ''} {canAccessAdminPanel}/>
+        <h1 class="text-3xl font-semibold text-gray-800 mt-2">Thread: {thread.title}</h1>
+        <div class="flex items-center">
+            {#if thread.pinned}
+                <Icon src={Pin} class="w-5 h-5 mr-2"/>
+            {/if}
+            {#if thread.locked}
+                <Icon src={Lock} class="w-5 h-5 mr-2"/>
+            {/if}
         </div>
 
         {#if !thread.locked && isLoggedIn}
@@ -369,12 +370,13 @@
                         </div>
                     </div>
                     <!-- Content and Quoted Posts with responsive design -->
-                    <div class="overflow-auto ml-5 mr-5 mt-4 w-auto">
+                    <div class="overflow-auto ml-5 mr-5 mt-4 w-full">
                         {#if post.quotedPost}
                             {@html renderQuotedPost(post.quotedPost)}
                         {/if}
                         <div class="post-content">{@html post.content}</div>
                     </div>
+
                 </div>
             {/each}
         </div>
@@ -501,27 +503,33 @@
 
     /* Styles for headers */
     :global(.post-content h1) {
-        @apply text-3xl font-semibold my-4; /* Adjust font size as needed */
+        @apply text-3xl font-semibold my-4;
+        /* Adjust font size as needed */
     }
 
     :global(.post-content h2) {
-        @apply text-2xl font-semibold my-3; /* Adjust font size as needed */
+        @apply text-2xl font-semibold my-3;
+        /* Adjust font size as needed */
     }
 
     :global(.post-content h3) {
-        @apply text-xl font-semibold my-2; /* Adjust font size as needed */
+        @apply text-xl font-semibold my-2;
+        /* Adjust font size as needed */
     }
 
     :global(.post-content h4) {
-        @apply text-lg font-semibold my-2; /* Adjust font size as needed */
+        @apply text-lg font-semibold my-2;
+        /* Adjust font size as needed */
     }
 
     :global(.post-content h5) {
-        @apply text-base font-semibold my-2; /* Adjust font size as needed */
+        @apply text-base font-semibold my-2;
+        /* Adjust font size as needed */
     }
 
     :global(.post-content h6) {
-        @apply text-sm font-semibold my-2; /* Adjust font size as needed */
+        @apply text-sm font-semibold my-2;
+        /* Adjust font size as needed */
     }
 
     /* Compact styles for ordered and unordered lists */
@@ -534,6 +542,7 @@
     }
 
     :global(.post-content li) {
-        @apply ml-2; /* Add margin to list items for indentation */
+        @apply ml-2;
+        /* Add margin to list items for indentation */
     }
 </style>
