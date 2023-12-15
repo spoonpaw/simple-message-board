@@ -1,9 +1,9 @@
 <!--src/lib/client/components/QuillEditor.svelte-->
 <script lang="ts">
-	import { onMount, onDestroy, createEventDispatcher } from 'svelte';
+	import {onMount, onDestroy, createEventDispatcher} from 'svelte';
 	import 'quill/dist/quill.snow.css';
-	import type { Quill as QuillType } from 'quill';
-	import { fade } from 'svelte/transition';
+	import type {Quill as QuillType} from 'quill';
+	import {fade} from 'svelte/transition';
 
 	const dispatch = createEventDispatcher();
 	let quillContainer: HTMLElement;
@@ -32,7 +32,14 @@
 		quill = new Quill(quillContainer, {
 			theme: 'snow',
 			modules: {
-				toolbar: [['bold', 'italic', 'underline', 'strike'], ['link', 'image'], ['clean']],
+				toolbar: [
+					['bold', 'italic', 'underline', 'strike'],
+					['blockquote', 'code-block'],
+					[{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+					[{'list': 'ordered'}, {'list': 'bullet'}],
+					['link', 'image'],
+					['clean']
+				],
 				imageUploader: {
 					upload: (file: File) => {
 						return new Promise<string>((resolve, reject) => {
@@ -57,7 +64,7 @@
 		// Define the handler function
 		textChangeHandler = () => {
 			if (quill) {
-				dispatch('textChange', { content: quill.root.innerHTML });
+				dispatch('textChange', {content: quill.root.innerHTML});
 			}
 		};
 
@@ -167,34 +174,34 @@
 
 <div bind:this={quillContainer}></div>
 {#if errorMessage}
-	<!-- Conditionally display the error message -->
-	<div
-		class="bg-red-50 border-l-4 border-red-400 p-2 text-red-600"
-		role="alert"
-		in:fade={{ duration: 300 }}
-		out:fade={{ duration: 300 }}
-	>
-		<span class="block sm:inline text-sm">{errorMessage}</span>
-	</div>
+    <!-- Conditionally display the error message -->
+    <div
+            class="bg-red-50 border-l-4 border-red-400 p-2 text-red-600"
+            role="alert"
+            in:fade={{ duration: 300 }}
+            out:fade={{ duration: 300 }}
+    >
+        <span class="block sm:inline text-sm">{errorMessage}</span>
+    </div>
 {/if}
 
 <style>
-	/* Style for the Quill editor container */
-	:global(.ql-container) {
-		max-height: 280px; /* Adjust the max-height as needed */
-		overflow-y: auto; /* Enables vertical scrolling */
-		border-radius: 0.25rem; /* Add rounded corners */
-	}
+    /* Style for the Quill editor container */
+    :global(.ql-container) {
+        max-height: 280px; /* Adjust the max-height as needed */
+        overflow-y: auto; /* Enables vertical scrolling */
+        border-radius: 0.25rem; /* Add rounded corners */
+    }
 
-	:global(.ql-toolbar) {
-		border-radius: 0.25rem;
-	}
+    :global(.ql-toolbar) {
+        border-radius: 0.25rem;
+    }
 
-	:global(.ql-tooltip) {
-		left: unset !important;
-	}
+    :global(.ql-tooltip) {
+        left: unset !important;
+    }
 
-	:global(.ql-editor) {
-		min-height: 200px;
-	}
+    :global(.ql-editor) {
+        min-height: 200px;
+    }
 </style>
