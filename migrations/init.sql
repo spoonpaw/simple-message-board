@@ -78,3 +78,16 @@ CREATE TABLE posts (
     deleted BOOLEAN DEFAULT FALSE,
     deleted_at TIMESTAMP WITH TIME ZONE
 );
+
+-- Private Messages Table
+CREATE TABLE private_messages (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    sender_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    recipient_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    subject VARCHAR(255) NOT NULL,
+    content TEXT NOT NULL,
+    sent_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    read_at TIMESTAMP WITH TIME ZONE,
+    is_deleted_sender BOOLEAN DEFAULT FALSE,
+    is_deleted_recipient BOOLEAN DEFAULT FALSE
+);

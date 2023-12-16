@@ -226,7 +226,7 @@
 		return `
 
         <div class="flex flex-col w-full inner-div">
-            <div class="post-content p-2 border-l-4 border-blue-500 mb-2 max-w-full">
+            <div class="formatted-content p-2 border-l-4 border-blue-500 mb-2 max-w-full">
                 <div class="text-sm font-medium">
                     <a href="/user/${quotedPost.authorId}" class="text-blue-600 hover:text-blue-800 hover:underline">
                         @${quotedPost.authorUsername}
@@ -374,7 +374,7 @@
                         {#if post.quotedPost}
                             {@html renderQuotedPost(post.quotedPost)}
                         {/if}
-                        <div class="post-content">{@html post.content}</div>
+                        <div class="formatted-content">{@html post.content}</div>
                     </div>
 
                 </div>
@@ -479,70 +479,3 @@
         </div>
     </Modal>
 {/if}
-
-<style lang="postcss">
-    /* Styles for links */
-    :global(.post-content a) {
-        @apply text-blue-500 underline cursor-pointer;
-    }
-
-    :global(.post-content a:hover),
-    :global(.post-content a:focus) {
-        @apply text-blue-700 no-underline;
-    }
-
-    /* Minimalist styles for block quotes */
-    :global(.post-content blockquote) {
-        @apply bg-gray-50 border-l-4 border-green-500 px-2 py-1 italic text-gray-800 my-2;
-    }
-
-    /* Minimalist styles for code blocks */
-    :global(.post-content pre) {
-        @apply bg-gray-800 text-white p-2 rounded-lg overflow-x-auto;
-    }
-
-    /* Styles for headers */
-    :global(.post-content h1) {
-        @apply text-3xl font-semibold my-4;
-        /* Adjust font size as needed */
-    }
-
-    :global(.post-content h2) {
-        @apply text-2xl font-semibold my-3;
-        /* Adjust font size as needed */
-    }
-
-    :global(.post-content h3) {
-        @apply text-xl font-semibold my-2;
-        /* Adjust font size as needed */
-    }
-
-    :global(.post-content h4) {
-        @apply text-lg font-semibold my-2;
-        /* Adjust font size as needed */
-    }
-
-    :global(.post-content h5) {
-        @apply text-base font-semibold my-2;
-        /* Adjust font size as needed */
-    }
-
-    :global(.post-content h6) {
-        @apply text-sm font-semibold my-2;
-        /* Adjust font size as needed */
-    }
-
-    /* Compact styles for ordered and unordered lists */
-    :global(.post-content ol) {
-        @apply list-decimal pl-4 my-2;
-    }
-
-    :global(.post-content ul) {
-        @apply list-disc pl-4 my-2;
-    }
-
-    :global(.post-content li) {
-        @apply ml-2;
-        /* Add margin to list items for indentation */
-    }
-</style>

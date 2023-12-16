@@ -1,24 +1,7 @@
 // src/lib/shared/htmlUtils/getTextFromHtml.ts
 
 import { htmlToText, type HtmlToTextOptions } from 'html-to-text';
-
-type ElementWithChildren = {
-	type: string;
-	name: string;
-	children: ElementWithChildren[];
-	_text: string;
-};
-
-type Builder = {
-	openBlock: (lineBreaks: number) => void;
-	closeBlock: (lineBreaks: number) => void;
-	text: (text: string) => void;
-};
-
-type FormatOptions = {
-	leadingLineBreaks: number;
-	trailingLineBreaks: number;
-};
+import type {Builder, ElementWithChildren, FormatOptions} from "$lib/shared/htmlUtils/types/htmlToText";
 
 export function getTextFromHtml(htmlString: string): string {
 	const options: HtmlToTextOptions = {

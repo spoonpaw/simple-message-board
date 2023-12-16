@@ -5,7 +5,7 @@
 	import Toast from "./Toast.svelte";
 </script>
 
-<div class="fixed bottom-4 right-4 flex flex-col-reverse space-y-2 space-y-reverse">
+<div class="z-20 fixed bottom-4 right-4 flex flex-col-reverse space-y-2 space-y-reverse">
     {#each $toastManager.slice().reverse() as toast (toast.id)}
         <Toast {toast} />
     {/each}

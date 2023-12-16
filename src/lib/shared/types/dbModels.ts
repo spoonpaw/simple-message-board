@@ -67,3 +67,15 @@ export interface Post {
 	deleted: boolean;
     deleted_at?: Date; // Add deleted_at field for posts
 }
+
+export interface PrivateMessage {
+	id: string;
+	sender_id: string;
+	recipient_id: string;
+	subject: string;
+	content: string;
+	sent_at: Date;
+	read_at: Date;
+	is_deleted_sender: boolean;
+	is_deleted_recipient: boolean;
+}

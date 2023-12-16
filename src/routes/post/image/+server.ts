@@ -5,7 +5,7 @@ import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import sharp from 'sharp'; // Import sharp
 import { v4 as uuidv4 } from 'uuid';
 import { env } from '$env/dynamic/private';
-// import {validateUser} from '$lib/server/auth';
+import {validateUser} from '$lib/server/auth';
 
 const s3Client = new S3Client({
 	credentials: {
@@ -18,13 +18,13 @@ const s3Client = new S3Client({
 const maxFileSize = 5 * 1024 * 1024; // 5MB
 
 export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
-	// const authenticatedUser = await validateUser(requestEvent);
-	// if (!authenticatedUser) {
-	// 	return new Response(JSON.stringify({error: 'Unauthorized'}), {
-	// 		status: 401,
-	// 		headers: {'Content-Type': 'application/json'}
-	// 	});
-	// }
+	const authenticatedUser = await validateUser(requestEvent);
+	if (!authenticatedUser) {
+		return new Response(JSON.stringify({error: 'Unauthorized'}), {
+			status: 401,
+			headers: {'Content-Type': 'application/json'}
+		});
+	}
 	const request = requestEvent.request;
 
 	const formData = await request.formData();

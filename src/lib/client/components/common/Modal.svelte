@@ -26,7 +26,7 @@
 
 {#if open}
 	<div
-		class="modal z-50 fixed w-full h-full top-0 left-0 flex items-center justify-center p-8 lg:p-0"
+		class="modal z-10 fixed w-full h-full top-0 left-0 flex items-center justify-center p-8 lg:p-0"
 		role="dialog"
 		aria-label={title}
 	>
@@ -38,12 +38,12 @@
 		></button>
 
 		<div
-			class="bg-white w-full lg:h-max lg:w-1/2 mx-auto rounded-lg shadow-xl z-50 overflow-y-auto"
+			class="bg-white w-full lg:h-max lg:w-1/2 mx-auto rounded-lg shadow-xl z-10 overflow-y-auto"
 		>
-			<div class="flex justify-between items-center head pt-5 px-8 text-2xl font-extrabold">
+			<div class="flex justify-between items-center head pt-2 px-4 text-2xl font-extrabold">
 				{title}
 			</div>
-			<div class="content p-8">
+			<div class="content px-2 py-2">
 				<slot name="body" />
 			</div>
 		</div>

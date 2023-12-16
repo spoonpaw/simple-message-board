@@ -11,5 +11,5 @@
 </script>
 
 <button on:click={navigateToAdminPanel} class="focus:outline-none hover:bg-green-100 p-1 rounded" title="Admin Panel">
-    <Icon src={Settings} class="w-4 h-4 text-green-500" />
+    <Icon src={Settings} class="w-5 h-5 text-green-500" />
 </button>

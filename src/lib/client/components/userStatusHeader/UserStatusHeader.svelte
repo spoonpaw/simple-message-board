@@ -5,6 +5,7 @@
 	import LoginButton from '$lib/client/components/userStatusHeader/LoginButton.svelte';
 	import AdminButton from "$lib/client/components/userStatusHeader/AdminButton.svelte";
 	import LogoutButton from "$lib/client/components/userStatusHeader/LogoutButton.svelte";
+    import MailButton from "$lib/client/components/userStatusHeader/MailButton.svelte";
 
 	export let username: string;
 	export let isLoggedIn: boolean;
@@ -19,6 +20,7 @@
             {#if canAccessAdminPanel}
                 <AdminButton/>
             {/if}
+            <MailButton/>
             <UserProfileButton {userId}/>
             <LogoutButton/>
         </div>

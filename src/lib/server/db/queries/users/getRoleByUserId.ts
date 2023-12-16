@@ -2,6 +2,7 @@
 
 import { pool } from "$lib/server";
 import type { QueryResult } from "pg";
+import type {Role} from "$lib/shared";
 
 export async function getRoleByUserId(userId: string): Promise<Role | null> {
 	const client = await pool.connect();

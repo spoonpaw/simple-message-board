@@ -43,24 +43,30 @@
                         Admin Panel
                     </a>
                 {/if}
-				<button
-					on:click={logout}
-					class="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
-				>
-					Logout
-				</button>
 				<a
-					href={`/user/${data.userid}`}
-					class="inline-block px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 transition duration-300"
-				>
-					View Profile
-				</a>
-				<a
-					href="/board"
-					class="inline-block px-6 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-300"
+						href="/board"
+						class="inline-block px-6 py-3 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-300"
 				>
 					Go to Board
 				</a>
+				<a
+						href={`/user/${data.userid}`}
+						class="inline-block px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 transition duration-300"
+				>
+					View Profile
+				</a>
+                <a
+                    href="/mail"
+                    class="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300"
+                >
+                    Mail
+                </a>
+				<button
+					on:click={logout}
+					class="px-6 py-3 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition duration-300"
+				>
+					Logout
+				</button>
 			</nav>
 		</div>
 	</div>

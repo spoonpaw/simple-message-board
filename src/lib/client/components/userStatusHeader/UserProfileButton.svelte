@@ -16,5 +16,5 @@
     class="focus:outline-none hover:bg-blue-100 p-1 rounded"
 	title="Go to User Profile"
 >
-    <Icon src={UserCircle} class="w-4 h-4 text-blue-500" />
+    <Icon src={UserCircle} class="w-5 h-5 text-blue-500" />
 </button>
