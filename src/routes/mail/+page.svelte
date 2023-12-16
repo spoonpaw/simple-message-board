@@ -13,6 +13,11 @@
 	import QuillEditor from '$lib/client/components/common/QuillEditor.svelte';
 	import {getTextFromHtml} from "$lib/shared/htmlUtils/getTextFromHtml";
 
+	import {onMount, onDestroy} from 'svelte';
+	import {io, Socket} from 'socket.io-client';
+
+	let socket: Socket;
+
 	export let data: PageServerData;
 
 	let {username, userId, receivedMessages, sentMessages, permissions} = data;
@@ -26,6 +31,21 @@
 	let messageSubject = '';
 	let messageContent = '';
 	let messageQuillEditor: QuillEditor; // Variable for Quill editor instance
+
+	async function fetchReceivedMessages() {
+		try {
+			const response = await fetch('/mail/received');
+			if (response.ok) {
+				const data = await response.json();
+				receivedMessages = data;
+				console.log('Received messages updated:', receivedMessages);
+			} else {
+				console.error('Failed to fetch received messages:', response.status);
+			}
+		} catch (error) {
+			console.error('Error fetching received messages:', error);
+		}
+	}
 
 	function openComposeMessageModal() {
 		composeMessageModal = true;
@@ -88,6 +108,11 @@
 					type: 'success',
 					duration: 3000
 				});
+
+				console.log(`sending 'message-sent' event to server with recipientUserId: ${newMessage.recipient_id}`);
+				// Notify the server about the new message
+				socket.emit('message-sent', { recipientUserId: newMessage.recipient_id });
+
 			} else {
 				const errorResponse = await response.json();
 				// Display error message using QuillEditor's error mechanism
@@ -212,6 +237,33 @@
 	// Character counters
 	$: messageSubjectLength = messageSubject.length;
 	$: messageContentLength = getTextFromHtml(messageContent).length;
+
+
+	onMount(() => {
+		socket = io();
+
+		socket.on('connect', () => {
+			console.log(`Connected to server. My socket ID: ${socket.id}`);
+
+			// Send the user ID to the server
+			socket.emit('register', {userId});
+		});
+
+		console.log('Registering event listener for message-received event');
+		socket.on('message-received', async () => {
+			console.log('Received a new message');
+			await fetchReceivedMessages();
+		});
+
+		// ... other logic ...
+	});
+
+	onDestroy(() => {
+		if (socket) {
+			console.log(`Disconnecting from server. My socket ID: ${socket.id}`);
+			socket.disconnect();
+		}
+	});
 
 </script>
 

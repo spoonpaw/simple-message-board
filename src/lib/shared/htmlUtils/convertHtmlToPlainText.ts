@@ -26,8 +26,3 @@ export function convertHtmlToPlainText(html: string): string {
 
 	return convert(html, options);
 }
-
-// Example usage
-const htmlInput = '<p>Hello, <img src="image.jpg"> world!</p>';
-const plainText = convertHtmlToPlainText(htmlInput);
-console.log(plainText); // Output: Hello, [image] world!
