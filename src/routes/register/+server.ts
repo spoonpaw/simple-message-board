@@ -5,6 +5,7 @@ import {pool} from '$lib/server';
 import bcrypt from 'bcrypt';
 import validator from 'validator';
 import {sendEmail} from "$lib/server/email/sendEmail";
+import { env } from '$env/dynamic/private';
 
 export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
 	const {username, email, password} = await requestEvent.request.json();
@@ -77,7 +78,7 @@ export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
 
 		try {
 			await sendEmail({
-				from: 'no-reply@netartisancollective.com',
+				from: `no-reply@${env.SES_EMAIL_DOMAIN}`,
 				to: email,
 				subject: 'Confirm your Net Artisan Collective Account',
 				text: `Please confirm your account by clicking on this link: ${confirmationLink}`,

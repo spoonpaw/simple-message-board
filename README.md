@@ -22,7 +22,7 @@ Before setting up the project, ensure you have the following installed:
 
 1. Clone the repository to your local machine:
    ```
-   git clone https://github.com/your-username/simple-message-board.git
+   git clone https://github.com/spoonpaw/simple-message-board.git
    ```
 
 2. Navigate to the project directory:
@@ -36,6 +36,13 @@ Before setting up the project, ensure you have the following installed:
    ```
 
 4. Copy the example `.env` file and fill in the values:
+
+### AWS SES Setup
+
+1. Log in to your AWS Management Console and navigate to the SES service.
+2. Verify a new domain or email address for sending emails.
+3. Create SMTP credentials in SES for your application.
+4. Add SES configuration details to your `.env` file, including AWS region, SES access key ID, secret access key, and the verified email domain.
 
 ### AWS S3 Bucket Setup
 
@@ -84,11 +91,6 @@ npm run preview
 5. Run database migrations on Heroku as needed.
 
 > Note: For specific Heroku deployment steps and configurations, refer to the deployment section of the SvelteKit documentation.
-
-## TODOs
-
-- Implement account verification via email.
-- Implement account recovery via email.
 
 ## License
 

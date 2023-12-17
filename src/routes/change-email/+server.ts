@@ -2,6 +2,7 @@ import type {RequestEvent} from '@sveltejs/kit';
 import {pool} from '$lib/server';
 import {sendEmail} from '$lib/server/email/sendEmail';
 import {validateUser} from '$lib/server/auth'; // Import the validateUser function
+import { env } from '$env/dynamic/private';
 
 export async function POST(requestEvent: RequestEvent) {
 	try {
@@ -34,7 +35,7 @@ export async function POST(requestEvent: RequestEvent) {
 			// Send the confirmation email
 			await sendEmail({
 				to: newEmail,
-				from: 'no-reply@netartisancollective.com',
+                from: `no-reply@${env.SES_EMAIL_DOMAIN}`,
 				subject: 'Confirm Your Email Change',
 				text: `Please use the following link to confirm your email change: ${confirmationLink}`,
 				html: `<p>Please use the following link to confirm your email change: <a href="${confirmationLink}">${confirmationLink}</a></p>`

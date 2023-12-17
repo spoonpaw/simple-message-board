@@ -3,6 +3,7 @@
 import type {RequestEvent} from '@sveltejs/kit';
 import {pool} from '$lib/server';
 import {sendEmail} from '$lib/server/email/sendEmail';
+import { env } from '$env/dynamic/private';
 
 export async function POST(requestEvent: RequestEvent) {
 	const {userIdentifier} = await requestEvent.request.json();
@@ -36,7 +37,7 @@ export async function POST(requestEvent: RequestEvent) {
 
 		await sendEmail({
 			to: user.email,
-			from: 'no-reply@netartisancollective.com',
+			from: `no-reply@${env.SES_EMAIL_DOMAIN}`,
 			subject: 'Password Reset',
 			text: `Please use the following link to reset your password: ${resetLink}`,
 			html: `<p>Please use the following link to reset your password: <a href="${resetLink}">${resetLink}</a></p>`
