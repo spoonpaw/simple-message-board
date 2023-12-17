@@ -1,3 +1,5 @@
+// src/lib/server/auth.ts
+
 import {error} from '@sveltejs/kit';
 import cookie from 'cookie';
 import jwt from 'jsonwebtoken';

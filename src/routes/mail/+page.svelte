@@ -12,14 +12,7 @@
 	import {toastManager} from "$lib/client/stores/toastManager";
 	import QuillEditor from '$lib/client/components/common/QuillEditor.svelte';
 	import {getTextFromHtml} from "$lib/shared/htmlUtils/getTextFromHtml";
-
-	import {onDestroy} from 'svelte';
-	import type {Socket} from 'socket.io-client';
-	import { socketStore } from '$lib/client/stores/socketStore';
 	import { unreadMessagesStore } from '$lib/client/stores/unreadMessagesStore';
-
-
-	let socket: Socket | null;
 
 	export let data: PageServerData;
 
@@ -37,20 +30,20 @@
 
     unreadMessagesStore.set(hasUnreadMessages);
 
-	async function fetchReceivedMessages() {
-		try {
-			const response = await fetch('/mail/received');
-			if (response.ok) {
-				const data = await response.json();
-				receivedMessages = data;
-				console.log('Received messages updated:', receivedMessages);
-			} else {
-				console.error('Failed to fetch received messages:', response.status);
-			}
-		} catch (error) {
-			console.error('Error fetching received messages:', error);
-		}
-	}
+	// async function fetchReceivedMessages() {
+	// 	try {
+	// 		const response = await fetch('/mail/received');
+	// 		if (response.ok) {
+	// 			const data = await response.json();
+	// 			receivedMessages = data;
+	// 			console.log('Received messages updated:', receivedMessages);
+	// 		} else {
+	// 			console.error('Failed to fetch received messages:', response.status);
+	// 		}
+	// 	} catch (error) {
+	// 		console.error('Error fetching received messages:', error);
+	// 	}
+	// }
 
 	function openComposeMessageModal() {
 		composeMessageModal = true;
@@ -113,11 +106,6 @@
 					type: 'success',
 					duration: 3000
 				});
-
-				console.log(`sending 'message-sent' event to server with recipientUserId: ${newMessage.recipient_id}`);
-				// Notify the server about the new message
-				socket?.emit('message-sent', { recipientUserId: newMessage.recipient_id });
-
 			} else {
 				const errorResponse = await response.json();
 				// Display error message using QuillEditor's error mechanism
@@ -251,38 +239,6 @@
 	$: messageSubjectLength = messageSubject.length;
 	$: messageContentLength = getTextFromHtml(messageContent).length;
 
-
-
-	// Reactive declaration to handle socket initialization
-	$: if ($socketStore) {
-		socket = $socketStore;
-		setupSocketListeners();
-	}
-
-	function setupSocketListeners() {
-		if (socket?.connected) {
-			console.log('Socket is already connected. Registering mail page.');
-			socket.emit('register-mail-page', { userId });
-		} else {
-			socket?.on('connect', () => {
-				console.log('Socket connected. Registering mail page.');
-				socket?.emit('register-mail-page', { userId });
-			});
-		}
-
-		socket?.on('mail-page-message-received', async () => {
-			console.log('Received mail-page-message-received event. Fetching messages.');
-			await fetchReceivedMessages();
-		});
-	}
-
-	onDestroy(() => {
-		if (socket) {
-			console.log('Deregistering Mail Page Component and removing event listeners.');
-			socket.emit('deregister-mail-page');
-			socket.off('mail-page-message-received');
-		}
-	});
 </script>
 
 <svelte:head>

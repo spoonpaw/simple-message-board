@@ -1,38 +1,10 @@
 <!--src/lib/client/components/userStatusHeader/MailButton.svelte-->
 
 <script lang="ts">
-	import {onDestroy} from 'svelte';
 	import {Icon} from '@steeze-ui/svelte-icon';
 	import {Mail} from '@steeze-ui/lucide-icons';
 	import {goto} from '$app/navigation';
-	import {socketStore} from '$lib/client/stores/socketStore';
     import { unreadMessagesStore } from '$lib/client/stores/unreadMessagesStore';
-	import type {Socket} from "socket.io-client";
-
-	export let userId: string;
-	let socket: Socket | null;
-
-	// Reactive declaration to handle socket initialization
-	$: if ($socketStore) {
-		socket = $socketStore;
-		setupSocketListeners();
-	}
-
-	function setupSocketListeners() {
-		socket?.emit('register-mail-button', {userId});
-
-		socket?.on('mail-button-message-received', () => {
-			console.log('mail-button-message-received, setting hasUnreadMessages to true');
-            unreadMessagesStore.set(true); // Update store value
-		});
-	}
-
-	onDestroy(() => {
-		if (socket) {
-			socket.emit('deregister-mail-button');
-			socket.off('mail-button-message-received');
-		}
-	});
 
 	function navigateToMailPage() {
 		goto('/mail');

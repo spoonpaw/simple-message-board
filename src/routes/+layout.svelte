@@ -1,30 +1,9 @@
 <!-- src/routes/+layout.svelte -->
 
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
-	import { io, Socket } from 'socket.io-client';
-	import { socketStore } from '$lib/client/stores/socketStore';
 	import '../app.css';
-
-	let socket: Socket;
-
-	onMount(() => {
-		socket = io();
-
-		socket.on('connect', () => {
-			console.log(`Connected to server. Socket ID: ${socket.id}`);
-			socketStore.set(socket); // Update the store with the socket instance
-		});
-	});
-
-	onDestroy(() => {
-		if (socket) {
-			socket.disconnect();
-			console.log(`Disconnected from server. Socket ID: ${socket.id}`);
-			socketStore.set(null); // Clear the store
-		}
-	});
 </script>
+
 
 <div class="min-h-screen bg-gray-50">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
