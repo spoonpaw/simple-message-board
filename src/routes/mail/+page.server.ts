@@ -9,7 +9,8 @@ import {
 import {getPermissionsByUserId} from "$lib/server/db/queries/permissions/getPermissionsByUserId";
 import {
 	getPrivateMessagesBySenderUserId
-} from "$lib/server/db/queries/privateMessages/getPrivateMessagesBySenderUserId"; // Adjust this import based on your actual shared types
+} from "$lib/server/db/queries/privateMessages/getPrivateMessagesBySenderUserId";
+import {checkUnreadPrivateMessagesByUserId} from "$lib/server/db/queries/users/checkUnreadPrivateMessagesByUserId"; // Adjust this import based on your actual shared types
 
 export async function load(requestEvent: RequestEvent) {
 	const authenticatedUser = await validateUser(requestEvent);
@@ -23,6 +24,7 @@ export async function load(requestEvent: RequestEvent) {
 	const sentMessages = await getPrivateMessagesBySenderUserId(authenticatedUser.id);
 
 	const permissions = await getPermissionsByUserId(authenticatedUser.id);
+	const hasUnreadMessages = await checkUnreadPrivateMessagesByUserId(authenticatedUser.id);
 
 
 	return {
@@ -31,5 +33,6 @@ export async function load(requestEvent: RequestEvent) {
 		receivedMessages,
 		sentMessages,
 		permissions: permissions,
+		hasUnreadMessages
 	};
 }

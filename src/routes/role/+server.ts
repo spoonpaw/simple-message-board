@@ -4,7 +4,7 @@ import type {RequestEvent} from "@sveltejs/kit";
 import {validateUser} from "$lib/server/auth";
 import {getPermissionsByUserId} from "$lib/server/db/queries/permissions/getPermissionsByUserId";
 import type {Role} from "$lib/shared";
-import {insertRole} from "$lib/server/db/queries/roles/insertRole";
+import {createRole} from "$lib/server/db/queries/roles/createRole";
 import {getAllRoles} from "$lib/server/db/queries/roles/getAllRoles";
 
 export async function POST(requestEvent: RequestEvent) {
@@ -32,7 +32,7 @@ export async function POST(requestEvent: RequestEvent) {
 		};
 
 		// Insert the new role
-		await insertRole(newRole);
+		await createRole(newRole);
 		const allRoles = await getAllRoles();
 
 		// Return success response

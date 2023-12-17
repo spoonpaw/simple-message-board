@@ -4,7 +4,7 @@
 	import type {RolePermission, Role, Permission} from '$lib/shared';
 
 	import {createEventDispatcher} from 'svelte';
-	import {toastManager} from "../../../../stores/toastManager";
+	import {toastManager} from "../../stores/toastManager";
 	import ToastContainer from "$lib/client/components/common/ToastContainer.svelte";
 
 	export let rolePermissions: RolePermission[];

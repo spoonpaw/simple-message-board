@@ -20,7 +20,7 @@
             {#if canAccessAdminPanel}
                 <AdminButton/>
             {/if}
-            <MailButton/>
+            <MailButton {userId}/>
             <UserProfileButton {userId}/>
             <LogoutButton/>
         </div>

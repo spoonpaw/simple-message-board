@@ -9,18 +9,21 @@
 	import {convertHtmlToPlainText} from "$lib/shared/htmlUtils/convertHtmlToPlainText";
 	import Modal from "$lib/client/components/common/Modal.svelte";
 	import ToastContainer from "$lib/client/components/common/ToastContainer.svelte";
-	import {toastManager} from "../../stores/toastManager";
+	import {toastManager} from "$lib/client/stores/toastManager";
 	import QuillEditor from '$lib/client/components/common/QuillEditor.svelte';
 	import {getTextFromHtml} from "$lib/shared/htmlUtils/getTextFromHtml";
 
-	import {onMount, onDestroy} from 'svelte';
-	import {io, Socket} from 'socket.io-client';
+	import {onDestroy} from 'svelte';
+	import type {Socket} from 'socket.io-client';
+	import { socketStore } from '$lib/client/stores/socketStore';
+	import { unreadMessagesStore } from '$lib/client/stores/unreadMessagesStore';
 
-	let socket: Socket;
+
+	let socket: Socket | null;
 
 	export let data: PageServerData;
 
-	let {username, userId, receivedMessages, sentMessages, permissions} = data;
+	let {username, userId, receivedMessages, sentMessages, permissions, hasUnreadMessages} = data;
 	let activeTab = 'inbox'; // 'inbox' or 'outbox'
 	let showReadMessageModal = false;
 	let selectedMessage: ReceivedMessageView | SentMessageView | null = null;
@@ -31,6 +34,8 @@
 	let messageSubject = '';
 	let messageContent = '';
 	let messageQuillEditor: QuillEditor; // Variable for Quill editor instance
+
+    unreadMessagesStore.set(hasUnreadMessages);
 
 	async function fetchReceivedMessages() {
 		try {
@@ -111,7 +116,7 @@
 
 				console.log(`sending 'message-sent' event to server with recipientUserId: ${newMessage.recipient_id}`);
 				// Notify the server about the new message
-				socket.emit('message-sent', { recipientUserId: newMessage.recipient_id });
+				socket?.emit('message-sent', { recipientUserId: newMessage.recipient_id });
 
 			} else {
 				const errorResponse = await response.json();
@@ -223,6 +228,14 @@
 
 					// Update only the receivedMessages array
 					receivedMessages = receivedMessages.map(m => m.id === messageId ? {...m, read_at} : m);
+
+					// Check if all received messages are now read
+					if (receivedMessages.every(m => m.read_at)) {
+						console.log('All received messages are now read. Setting hasUnreadMessages to false.')
+						hasUnreadMessages = false;
+						unreadMessagesStore.set(hasUnreadMessages);
+						console.log(`value of hasUnreadMessages: ${hasUnreadMessages}`);
+					}
 				}
 			}
 		}
@@ -239,32 +252,37 @@
 	$: messageContentLength = getTextFromHtml(messageContent).length;
 
 
-	onMount(() => {
-		socket = io();
 
-		socket.on('connect', () => {
-			console.log(`Connected to server. My socket ID: ${socket.id}`);
+	// Reactive declaration to handle socket initialization
+	$: if ($socketStore) {
+		socket = $socketStore;
+		setupSocketListeners();
+	}
 
-			// Send the user ID to the server
-			socket.emit('register', {userId});
-		});
+	function setupSocketListeners() {
+		if (socket?.connected) {
+			console.log('Socket is already connected. Registering mail page.');
+			socket.emit('register-mail-page', { userId });
+		} else {
+			socket?.on('connect', () => {
+				console.log('Socket connected. Registering mail page.');
+				socket?.emit('register-mail-page', { userId });
+			});
+		}
 
-		console.log('Registering event listener for message-received event');
-		socket.on('message-received', async () => {
-			console.log('Received a new message');
+		socket?.on('mail-page-message-received', async () => {
+			console.log('Received mail-page-message-received event. Fetching messages.');
 			await fetchReceivedMessages();
 		});
-
-		// ... other logic ...
-	});
+	}
 
 	onDestroy(() => {
 		if (socket) {
-			console.log(`Disconnecting from server. My socket ID: ${socket.id}`);
-			socket.disconnect();
+			console.log('Deregistering Mail Page Component and removing event listeners.');
+			socket.emit('deregister-mail-page');
+			socket.off('mail-page-message-received');
 		}
 	});
-
 </script>
 
 <svelte:head>

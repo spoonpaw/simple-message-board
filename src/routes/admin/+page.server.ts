@@ -8,6 +8,7 @@ import {getPermissionsByUserId} from "$lib/server/db/queries/permissions/getPerm
 import {getAllRoles} from "$lib/server/db/queries/roles/getAllRoles";
 import {getAllPermissions} from "$lib/server/db/queries/permissions/getAllPermissions";
 import {getAllRolePermissions} from "$lib/server/db/queries/rolePermissions/getAllRolePermissions";
+import {checkUnreadPrivateMessagesByUserId} from "$lib/server/db/queries/users/checkUnreadPrivateMessagesByUserId";
 
 export async function load(requestEvent: RequestEvent) {
 	const authenticatedUser = await validateUser(requestEvent);
@@ -24,6 +25,9 @@ export async function load(requestEvent: RequestEvent) {
 		throw redirect(302, '/');
 	}
 
+    // Check for unread private messages
+    const hasUnreadMessages = await checkUnreadPrivateMessagesByUserId(authenticatedUser.id);
+
 	// Fetch all roles, permissions, and role-permissions
 	const roles: Role[] = await getAllRoles();
 	const permissions: Permission[] = await getAllPermissions();
@@ -33,8 +37,9 @@ export async function load(requestEvent: RequestEvent) {
 		username: authenticatedUser.username,
 		userid: authenticatedUser.id,
 		userPermissions,
-		roles: roles,
-		permissions: permissions,
-		rolePermissions: rolePermissions,
+        roles,
+        permissions,
+        rolePermissions,
+        hasUnreadMessages,  // Add this line
 	};
 }

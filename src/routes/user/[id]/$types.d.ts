@@ -28,4 +28,5 @@ export interface PageData {
 	authenticatedUserHierarchyLevel: number | null; // The hierarchy level of the authenticated user, if any
 	permissions: Permission[];
 	roles: Role[];
+	hasUnreadMessages: boolean;
 }

@@ -1,9 +1,9 @@
-// src/lib/server/db/queries/roles/insertRole.ts
+// src/lib/server/db/queries/roles/createRole.ts
 
 import { pool } from '$lib/server';
 import type { Role } from "$lib/shared";
 
-export async function insertRole(newRole: Omit<Role, 'id'>): Promise<Role> {
+export async function createRole(newRole: Omit<Role, 'id'>): Promise<Role> {
 	const client = await pool.connect();
 
 	try {

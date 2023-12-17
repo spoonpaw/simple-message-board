@@ -7,6 +7,7 @@ import type { PageServerData } from './$types';
 import { getThreadsByCategoryId, pool } from '$lib/server';
 import {getPermissionsByUserId} from "$lib/server/db/queries/permissions/getPermissionsByUserId";
 import type {Permission} from "$lib/shared";
+import {checkUnreadPrivateMessagesByUserId} from "$lib/server/db/queries/users/checkUnreadPrivateMessagesByUserId";
 
 export async function load(requestEvent: RequestEvent): Promise<PageServerData> {
 	const { params } = requestEvent;
@@ -16,11 +17,13 @@ export async function load(requestEvent: RequestEvent): Promise<PageServerData> 
 	let username = 'Anonymous';
 	let userid: string | undefined = undefined;
 	let permissions: Permission[] = [];
+	let hasUnreadMessages = false;
 
 	if (authenticatedUser) {
 		username = authenticatedUser.username;
 		userid = authenticatedUser.id;
 		permissions = await getPermissionsByUserId(userid);
+		hasUnreadMessages = await checkUnreadPrivateMessagesByUserId(userid);
 	}
 
 	const categoryId = params.id;
@@ -41,6 +44,7 @@ export async function load(requestEvent: RequestEvent): Promise<PageServerData> 
 	// Use helper function to fetch threads
 	const threads = await getThreadsByCategoryId(categoryId);
 
+
 	client.release();
 
 	return {
@@ -48,6 +52,7 @@ export async function load(requestEvent: RequestEvent): Promise<PageServerData> 
 		userid,
 		category,
 		threads,
-		permissions
+		permissions,
+		hasUnreadMessages
 	};
 }

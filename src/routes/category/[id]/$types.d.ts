@@ -10,4 +10,5 @@ export interface PageServerData {
 	category: Category;
 	threads: ThreadCategoryView[];
 	permissions: Permission[];
+	hasUnreadMessages: boolean;
 }

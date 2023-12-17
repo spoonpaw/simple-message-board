@@ -11,9 +11,12 @@
 	import {parse, HTMLElement} from 'node-html-parser';
 	import type {PostThreadView} from "$lib/shared/types/PostThreadView";
 	import Navbar from "$lib/client/components/common/Navbar.svelte";
+	import { unreadMessagesStore } from '$lib/client/stores/unreadMessagesStore';
 
 	export let data: PageServerData;
-	let {username, userid, thread, permissions} = data;
+	let {username, userid, thread, permissions, hasUnreadMessages} = data;
+	unreadMessagesStore.set(hasUnreadMessages);
+
 	const isLoggedIn = !!userid;
 
 	let editPostModal = false; // Modal for modifying an existing post

@@ -2,7 +2,7 @@
 
 import type { RequestEvent } from "@sveltejs/kit";
 import { validateUser } from "$lib/server/auth";
-import {markPrivateMessageAsRead} from "$lib/server/db/queries/privateMessages/markPrivateMessageAsRead";
+import {updatePrivateMessageAsRead} from "$lib/server/db/queries/privateMessages/updatePrivateMessageAsRead";
 
 export async function POST(requestEvent: RequestEvent) {
 	try {
@@ -16,7 +16,7 @@ export async function POST(requestEvent: RequestEvent) {
 			return new Response(null, { status: 400 });
 		}
 
-        const read_at = await markPrivateMessageAsRead(messageId, user.id);
+        const read_at = await updatePrivateMessageAsRead(messageId, user.id);
 		return new Response(JSON.stringify({ read_at }), {
 			status: 200,
 			headers: { 'Content-Type': 'application/json' }

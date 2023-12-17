@@ -24,5 +24,5 @@
             {text}
         </button>
     </div>
-    <UserStatusHeader {isLoggedIn} {username} userId={userId} {canAccessAdminPanel}/>
+    <UserStatusHeader {isLoggedIn} {username} {userId} {canAccessAdminPanel}/>
 </nav>

@@ -3,8 +3,7 @@
 <script lang="ts">
 	import { fade } from 'svelte/transition';
 	import { onMount } from 'svelte';
-	import { toastManager } from "../../../../stores/toastManager";
-	import type { Toast as ToastType } from "../../../../stores/toastManager";
+	import {type Toast as ToastType, toastManager} from "../../stores/toastManager";
 
 	export let toast: ToastType;
 

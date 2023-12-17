@@ -18,4 +18,5 @@ export interface PageServerData {
 	userid?: string;
 	permissions: Permission[];
 	thread: ThreadView;
+	hasUnreadMessages: boolean;
 }

@@ -1,4 +1,4 @@
-// src/lib/server/db/queries/privateMessages/markPrivateMessageAsRead.ts
+// src/lib/server/db/queries/privateMessages/updatePrivateMessageAsRead.ts
 
 import {pool} from "$lib/server";
 
@@ -8,7 +8,7 @@ import {pool} from "$lib/server";
  * @param {string} userId - The ID of the authenticated user.
  * @returns {Promise<string>} The timestamp when the message was read.
  */
-export async function markPrivateMessageAsRead(messageId: string, userId: string) {
+export async function updatePrivateMessageAsRead(messageId: string, userId: string) {
 	const client = await pool.connect();
 	try {
 		// Update the read_at field only if the user is the recipient of the message

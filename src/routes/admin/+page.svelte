@@ -8,12 +8,15 @@
 	import type {Role, RolePermission} from "$lib/shared";
 	import Navbar from "$lib/client/components/common/Navbar.svelte";
 	import {goto} from "$app/navigation";
+	import { unreadMessagesStore } from '$lib/client/stores/unreadMessagesStore';
 
 	export let data: PageServerData;
 
-	let {roles, permissions, rolePermissions, username, userid} = data;
+	let {roles, permissions, rolePermissions, username, userid, hasUnreadMessages} = data;
 
 	let activeTab = 'roles';
+
+	unreadMessagesStore.set(hasUnreadMessages);
 
 	function handlePermissionChange(event: CustomEvent<{ roleId: string; permissionId: string; newState: boolean }>) {
 		const { roleId, permissionId, newState } = event.detail;

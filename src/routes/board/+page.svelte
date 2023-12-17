@@ -9,6 +9,7 @@
 	import Modal from "$lib/client/components/common/Modal.svelte";
 	import {fade} from 'svelte/transition';
 	import Navbar from "$lib/client/components/common/Navbar.svelte";
+	import { unreadMessagesStore } from '$lib/client/stores/unreadMessagesStore';
 
 	export let data: PageServerData;
 	let username = data.username;
@@ -16,6 +17,8 @@
 	let categories: Category[] = data.categories;
 	let permissions: Permission[] = data.permissions;
 	let isLoggedIn = !!data.userid;
+	let hasUnreadMessages = data.hasUnreadMessages;
+	unreadMessagesStore.set(hasUnreadMessages);
 
 	// Initialize permission flags
 	let canCreateCategory = false;

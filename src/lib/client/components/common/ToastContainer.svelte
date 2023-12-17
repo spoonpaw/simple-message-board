@@ -1,7 +1,7 @@
 <!--src/lib/client/components/common/ToastContainer.svelte-->
 
 <script lang="ts">
-	import { toastManager } from "../../../../stores/toastManager";
+	import { toastManager } from "../../stores/toastManager";
 	import Toast from "./Toast.svelte";
 </script>
 

@@ -5,10 +5,11 @@
 	import {Icon} from '@steeze-ui/svelte-icon';
 	import {Home, Pencil} from '@steeze-ui/lucide-icons';
 	import Modal from '$lib/client/components/common/Modal.svelte';
-	import {toastManager} from "../../../stores/toastManager";
+	import {toastManager} from "$lib/client/stores/toastManager";
 	import ToastContainer from "$lib/client/components/common/ToastContainer.svelte";
 	import Navbar from "$lib/client/components/common/Navbar.svelte";
 	import {goto} from "$app/navigation";
+	import { unreadMessagesStore } from '$lib/client/stores/unreadMessagesStore';
 
 	export let data: PageData;
 
@@ -22,6 +23,8 @@
 	let showEmailChangeModal = false;
 	let newEmail = '';
 	let emailChangeWarningMessage = '';
+	let hasUnreadMessages = data.hasUnreadMessages;
+	unreadMessagesStore.set(hasUnreadMessages);
 
 	let showAssignRoleModal = false;
 	let selectedRoleId: string | undefined; // This will be bound to the dropdown

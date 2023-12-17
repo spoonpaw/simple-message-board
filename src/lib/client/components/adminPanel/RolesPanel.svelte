@@ -5,7 +5,7 @@
 	import {Icon} from '@steeze-ui/svelte-icon';
 	import {Pencil, Trash2} from '@steeze-ui/lucide-icons';
 	import ToastContainer from "$lib/client/components/common/ToastContainer.svelte";
-	import {toastManager} from "../../../../stores/toastManager";
+	import {toastManager} from "../../stores/toastManager";
 
 	export let roles: Role[] = [];
 	let showCreateRoleModal = false;

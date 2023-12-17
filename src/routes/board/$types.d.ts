@@ -7,4 +7,5 @@ export interface PageServerData {
 	userid?: string;
 	categories: Category[]; // Add this line to include categories
 	permissions: Permission[];
+	hasUnreadMessages: boolean;
 }

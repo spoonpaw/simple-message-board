@@ -7,4 +7,5 @@ export interface PageServerData {
 	roles: Role[],
 	permissions:	Permission[],
 	rolePermissions:	RolePermission[],
+	hasUnreadMessages: boolean,
 }

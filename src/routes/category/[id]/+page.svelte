@@ -10,9 +10,11 @@
 	import QuillEditor from '$lib/client/components/common/QuillEditor.svelte';
 	import {getTextFromHtml} from '$lib/shared/htmlUtils/getTextFromHtml';
 	import Navbar from "$lib/client/components/common/Navbar.svelte";
+	import { unreadMessagesStore } from '$lib/client/stores/unreadMessagesStore';
 
 	export let data: PageServerData;
-	const {username, userid, category, permissions} = data;
+	const {username, userid, category, permissions, hasUnreadMessages} = data;
+	unreadMessagesStore.set(hasUnreadMessages);
 	let threads: ThreadCategoryView[] = data.threads;
 	const isLoggedIn = !!userid;
 	let newThreadModal = false; // Modal for creating a new thread

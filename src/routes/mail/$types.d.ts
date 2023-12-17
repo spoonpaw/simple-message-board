@@ -16,4 +16,5 @@ export interface PageServerData {
 	receivedMessages: ReceivedMessageView[]; // Array of received message views
 	sentMessages: SentMessageView[]; // Array of sent message views
 	permissions: Permission[];
+	hasUnreadMessages: boolean;
 }

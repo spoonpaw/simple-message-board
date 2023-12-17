@@ -10,6 +10,7 @@ import {getUserById} from "$lib/server/db/queries/users/getUserById";
 import {getRoleByUserId} from "$lib/server/db/queries/users/getRoleByUserId";
 import {getAllRoles} from "$lib/server/db/queries/roles/getAllRoles";
 import {getPostCountByUserId} from "$lib/server/db/queries/users/getPostCountByUserId";
+import {checkUnreadPrivateMessagesByUserId} from "$lib/server/db/queries/users/checkUnreadPrivateMessagesByUserId";
 
 export async function load(requestEvent: RequestEvent) {
 	const {id} = requestEvent.params;
@@ -31,9 +32,13 @@ export async function load(requestEvent: RequestEvent) {
     let authenticatedUserHierarchyLevel = null;
     let requestedUserHierarchyLevel = null;
 
+	let hasUnreadMessages = false;
+
 	if (authenticatedUser) {
 		permissions = await getPermissionsByUserId(authenticatedUser.id);
         authenticatedUserHierarchyLevel = await getHierarchyLevelByUserId(authenticatedUser.id);
+		hasUnreadMessages = await checkUnreadPrivateMessagesByUserId(authenticatedUser.id);
+
 	}
 
     requestedUserHierarchyLevel = await getHierarchyLevelByUserId(id);
@@ -66,6 +71,7 @@ export async function load(requestEvent: RequestEvent) {
 		authenticatedUsername: authenticatedUser ? authenticatedUser.username : 'Anonymous',
         authenticatedUserHierarchyLevel, // Pass hierarchy level of authenticated user
 		permissions: permissions,
-		roles
+		roles,
+		hasUnreadMessages
 	};
 }
