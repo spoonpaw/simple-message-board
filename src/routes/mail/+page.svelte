@@ -12,8 +12,9 @@
 	import {toastManager} from "$lib/client/stores/toastManager";
 	import QuillEditor from '$lib/client/components/common/QuillEditor.svelte';
 	import {getTextFromHtml} from "$lib/shared/htmlUtils/getTextFromHtml";
-	import { unreadMessagesStore } from '$lib/client/stores/unreadMessagesStore';
+	import {unreadMessagesStore} from '$lib/client/stores/unreadMessagesStore';
 	import {onDestroy, onMount} from "svelte";
+	import {page} from '$app/stores'; // Import the page store
 
 	export let data: PageServerData;
 
@@ -29,9 +30,9 @@
 	let messageContent = '';
 	let messageQuillEditor: QuillEditor; // Variable for Quill editor instance
 
-    let eventSource: EventSource | null = null;
+	let eventSource: EventSource | null = null;
 
-    unreadMessagesStore.set(hasUnreadMessages);
+	unreadMessagesStore.set(hasUnreadMessages);
 
 	async function fetchReceivedMessages() {
 		try {
@@ -261,6 +262,14 @@
 			console.error(`[MailPage] SSE connection error:`, error);
 			eventSource?.close();
 		};
+
+		// Extract and use the 'composeTo' query parameter
+		const queryParams = $page.url.searchParams;
+		const composeTo = queryParams.get('composeTo');
+		if (composeTo) {
+			messageRecipient = composeTo;
+			openComposeMessageModal();
+		}
 	});
 
 	onDestroy(() => {

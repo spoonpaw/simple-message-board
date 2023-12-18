@@ -9,7 +9,7 @@
 	import ToastContainer from "$lib/client/components/common/ToastContainer.svelte";
 	import Navbar from "$lib/client/components/common/Navbar.svelte";
 	import {goto} from "$app/navigation";
-	import { unreadMessagesStore } from '$lib/client/stores/unreadMessagesStore';
+	import {unreadMessagesStore} from '$lib/client/stores/unreadMessagesStore';
 
 	export let data: PageData;
 
@@ -292,6 +292,12 @@
 	function navigateToHome() {
 		goto('/');
 	}
+
+	function sendMessage() {
+		console.log(`Sending message to ${data.userProfile.id}`);
+		goto(`/mail?composeTo=${data.userProfile.username}`);
+	}
+
 </script>
 
 <svelte:head>
@@ -318,24 +324,38 @@
             {#if banned}
                 <p class="text-red-600 font-semibold mb-4">This user is currently banned.</p>
             {/if}
-            {#if canBanUsersOfLowerRole && (data.authenticatedUserHierarchyLevel !== null && (data.userProfile.hierarchyLevel === null || data.authenticatedUserHierarchyLevel < data.userProfile.hierarchyLevel))}
-                {#if banned}
+
+            <div class="mb-4">
+                {#if !data.userProfile.isOwnProfile}
                     <button
-                            on:click={unbanUser}
-                            class="mb-4 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-300"
+                            on:click={sendMessage}
+                            class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition duration-300"
                     >
-                        Unban User
-                    </button>
-                {:else}
-                    <button
-                            on:click={banUser}
-                            class="mb-4 px-4 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition duration-300"
-                    >
-                        Ban User
+                        Message
                     </button>
                 {/if}
 
-            {/if}
+                {#if canBanUsersOfLowerRole && (data.authenticatedUserHierarchyLevel !== null && (data.userProfile.hierarchyLevel === null || data.authenticatedUserHierarchyLevel < data.userProfile.hierarchyLevel))}
+                    {#if banned}
+                        <button
+                                on:click={unbanUser}
+                                class="mb-4 px-4 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-md hover:bg-green-700 transition duration-300"
+                        >
+                            Unban
+                        </button>
+                    {:else}
+                        <button
+                                on:click={banUser}
+                                class="mb-4 px-4 py-2 bg-red-600 text-white font-semibold rounded-lg shadow-md hover:bg-red-700 transition duration-300"
+                        >
+                            Ban
+                        </button>
+                    {/if}
+
+                {/if}
+            </div>
+
+
             <div class="flex flex-col items-center md:flex-row md:items-start md:space-x-6">
                 <!-- Profile image section -->
                 <div
