@@ -38,6 +38,12 @@ export async function POST(requestEvent: RequestEvent) {
 			return new Response(JSON.stringify({message: 'Recipient not found'}), {status: 404});
 		}
 
+		// Check if the recipient is the same as the sender
+		if (recipientId === user.id) {
+			console.log('Attempt to send message to self:', user.id);
+			return new Response(JSON.stringify({message: 'Cannot send messages to oneself'}), {status: 400});
+		}
+
 		// Sanitize the content
 		const sanitizedContent = sanitizeHtml(content, {
 			allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img']),
@@ -48,7 +54,6 @@ export async function POST(requestEvent: RequestEvent) {
 			allowedSchemes: ['http', 'https', 'ftp', 'mailto', 'tel']
 		});
 		console.log('Sanitized content:', sanitizedContent);
-
 
 		const newMessage = await createNewPrivateMessage(
 			user.id,
