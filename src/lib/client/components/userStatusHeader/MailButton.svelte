@@ -4,19 +4,25 @@
 	import {Icon} from '@steeze-ui/svelte-icon';
 	import {Mail} from '@steeze-ui/lucide-icons';
 	import {goto} from '$app/navigation';
-    import { unreadMessagesStore } from '$lib/client/stores/unreadMessagesStore';
-	import { onMount, onDestroy } from 'svelte';
+	import {unreadMessagesStore} from '$lib/client/stores/unreadMessagesStore';
+	import {onMount, onDestroy} from 'svelte';
 
 	export let userId: string;
-    let eventSource: EventSource | null = null;
+	let eventSource: EventSource | null = null;
+	let reconnectInterval: number | null = null;
 
-
-	onMount(() => {
-        console.log(`[MailButton] Mounting component and initializing SSE connection.`);
-        eventSource = new EventSource(`/events/mail-button`);
+	function initializeEventSource() {
+		eventSource = new EventSource(`/events/mail-button`);
 
 		eventSource.onmessage = (event) => {
 			console.log(`[MailButton] Received event:`, event);
+
+			// Handle heartbeat messages for debugging or monitoring
+			if (event.data === ':heartbeat') {
+				console.log('[MailButton] Heartbeat received.');
+				return;
+			}
+
 			const eventData = JSON.parse(event.data); // Parse the JSON string
 
 			if (eventData === 'newMessageReceived') {
@@ -25,17 +31,29 @@
 			}
 		};
 
-        eventSource.onerror = (error) => {
-            console.error(`[MailButton] SSE connection error:`, error);
-			if (eventSource) {
-				eventSource.close();
-            }
-        };
+		eventSource.onerror = (error) => {
+			console.error(`[MailButton] SSE connection error:`, error);
+			eventSource?.close();
+			// Clear any existing reconnection attempt
+			if (reconnectInterval !== null) {
+				clearTimeout(reconnectInterval);
+			}
+			// Cast setTimeout return value to number
+			reconnectInterval = setTimeout(initializeEventSource, 5000) as unknown as number;
+		};
+	}
+
+	onMount(() => {
+		console.log(`[MailButton] Mounting component and initializing SSE connection.`);
+		initializeEventSource();
 	});
 
 	onDestroy(() => {
-        console.log(`[MailButton] Unmounting component and closing SSE connection.`);
-        eventSource?.close();
+		console.log(`[MailButton] Unmounting component and closing SSE connection.`);
+		if (reconnectInterval !== null) {
+			clearTimeout(reconnectInterval);
+		}
+		eventSource?.close();
 	});
 
 	function navigateToMailPage() {

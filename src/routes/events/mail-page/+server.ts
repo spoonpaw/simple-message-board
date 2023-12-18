@@ -1,8 +1,8 @@
 // src/routes/events/mail-page/+server.ts
 
-import type { RequestEvent } from "@sveltejs/kit";
-import { validateUser } from "$lib/server/auth";
-import {UserMailPageConnections} from "$lib/server/sse/userMailPageConnections";
+import type { RequestEvent } from '@sveltejs/kit';
+import { validateUser } from '$lib/server/auth';
+import { UserMailPageConnections } from '$lib/server/sse/userMailPageConnections';
 
 export async function GET(requestEvent: RequestEvent): Promise<Response> {
 	const authenticatedUser = await validateUser(requestEvent);
@@ -18,7 +18,7 @@ export async function GET(requestEvent: RequestEvent): Promise<Response> {
 	const headers = {
 		'Content-Type': 'text/event-stream',
 		'Cache-Control': 'no-cache',
-		'Connection': 'keep-alive',
+		'Connection': 'keep-alive'
 	};
 
 	const userMailPageConnections = UserMailPageConnections.getInstance();
@@ -32,10 +32,18 @@ export async function GET(requestEvent: RequestEvent): Promise<Response> {
 
 			userMailPageConnections.addConnection(userId, sendEvent);
 			sendEvent(`User ${userId} successfully connected to the Mail Page Events channel.`);
-		},
-		cancel() {
+
+			// Heartbeat: Send a comment line every 50 seconds to keep the connection alive
+			const heartbeatInterval = setInterval(() => {
+				controller.enqueue(':heartbeat\n\n');
+			}, 50000);
+
+			// Stop the heartbeat when the connection is closed
+			requestEvent.request.signal.addEventListener('abort', () => {
+				clearInterval(heartbeatInterval);
 			console.log(`[MailPageEventsSSE] Connection closed for user ID: ${userId}`);
 			userMailPageConnections.removeConnection(userId);
+			});
 		}
 	});
 

@@ -1,19 +1,19 @@
 <!-- src/routes/mail/+page.svelte -->
 
 <script lang="ts">
-	import Navbar from "$lib/client/components/common/Navbar.svelte";
-	import {Home, Edit2} from "@steeze-ui/lucide-icons";
-	import {goto} from "$app/navigation";
+	import Navbar from '$lib/client/components/common/Navbar.svelte';
+	import {Home, Edit2} from '@steeze-ui/lucide-icons';
+	import {goto} from '$app/navigation';
 	import type {PageServerData, ReceivedMessageView, SentMessageView} from './$types';
-	import {Icon} from "@steeze-ui/svelte-icon";
-	import {convertHtmlToPlainText} from "$lib/shared/htmlUtils/convertHtmlToPlainText";
-	import Modal from "$lib/client/components/common/Modal.svelte";
-	import ToastContainer from "$lib/client/components/common/ToastContainer.svelte";
-	import {toastManager} from "$lib/client/stores/toastManager";
+	import {Icon} from '@steeze-ui/svelte-icon';
+	import {convertHtmlToPlainText} from '$lib/shared/htmlUtils/convertHtmlToPlainText';
+	import Modal from '$lib/client/components/common/Modal.svelte';
+	import ToastContainer from '$lib/client/components/common/ToastContainer.svelte';
+	import {toastManager} from '$lib/client/stores/toastManager';
 	import QuillEditor from '$lib/client/components/common/QuillEditor.svelte';
-	import {getTextFromHtml} from "$lib/shared/htmlUtils/getTextFromHtml";
+	import {getTextFromHtml} from '$lib/shared/htmlUtils/getTextFromHtml';
 	import {unreadMessagesStore} from '$lib/client/stores/unreadMessagesStore';
-	import {onDestroy, onMount} from "svelte";
+	import {onDestroy, onMount} from 'svelte';
 	import {page} from '$app/stores'; // Import the page store
 
 	export let data: PageServerData;
@@ -31,6 +31,8 @@
 	let messageQuillEditor: QuillEditor; // Variable for Quill editor instance
 
 	let eventSource: EventSource | null = null;
+
+	let reconnectInterval: number | null = null;
 
 	unreadMessagesStore.set(hasUnreadMessages);
 
@@ -223,7 +225,7 @@
 
 					// Check if all received messages are now read
 					if (receivedMessages.every(m => m.read_at)) {
-						console.log('All received messages are now read. Setting hasUnreadMessages to false.')
+						console.log('All received messages are now read. Setting hasUnreadMessages to false.');
 						hasUnreadMessages = false;
 						unreadMessagesStore.set(hasUnreadMessages);
 						console.log(`value of hasUnreadMessages: ${hasUnreadMessages}`);
@@ -243,12 +245,18 @@
 	$: messageSubjectLength = messageSubject.length;
 	$: messageContentLength = getTextFromHtml(messageContent).length;
 
-	onMount(() => {
-		console.log(`[MailPage] Mounting component and initializing SSE connection.`);
+
+	function initializeEventSource() {
 		eventSource = new EventSource(`/events/mail-page`);
 
 		eventSource.onmessage = (event) => {
 			console.log(`[MailPage] Received event:`, event);
+
+			if (event.data === ':heartbeat') {
+				console.log('[MailPage] Heartbeat received.');
+				return;
+			}
+
 			const eventData = JSON.parse(event.data);
 
 			if (eventData === 'newMessageReceived') {
@@ -261,7 +269,17 @@
 		eventSource.onerror = (error) => {
 			console.error(`[MailPage] SSE connection error:`, error);
 			eventSource?.close();
+			if (reconnectInterval !== null) {
+				clearTimeout(reconnectInterval);
+			}
+			reconnectInterval = setTimeout(initializeEventSource, 5000) as unknown as number;
 		};
+	}
+
+	onMount(() => {
+		console.log(`[MailPage] Mounting component and initializing SSE connection.`);
+		initializeEventSource();
+
 
 		// Extract and use the 'composeTo' query parameter
 		const queryParams = $page.url.searchParams;
@@ -274,6 +292,9 @@
 
 	onDestroy(() => {
 		console.log(`[MailPage] Unmounting component and closing SSE connection.`);
+		if (reconnectInterval !== null) {
+			clearTimeout(reconnectInterval);
+		}
 		eventSource?.close();
 	});
 

@@ -1,8 +1,8 @@
 // src/routes/events/mail-button/+server.ts
 
-import type {RequestEvent} from "@sveltejs/kit";
+import type { RequestEvent } from '@sveltejs/kit';
 import {UserMailButtonConnections} from '$lib/server/sse/userMailButtonConnections';
-import {validateUser} from "$lib/server/auth";
+import { validateUser } from '$lib/server/auth';
 
 export async function GET(requestEvent: RequestEvent): Promise<Response> {
 	const authenticatedUser = await validateUser(requestEvent);
@@ -18,7 +18,7 @@ export async function GET(requestEvent: RequestEvent): Promise<Response> {
 	const headers = {
 		'Content-Type': 'text/event-stream',
 		'Cache-Control': 'no-cache',
-		'Connection': 'keep-alive',
+		'Connection': 'keep-alive'
 	};
 
 	const userMailButtonConnections = UserMailButtonConnections.getInstance();
@@ -33,10 +33,17 @@ export async function GET(requestEvent: RequestEvent): Promise<Response> {
 			userMailButtonConnections.addConnection(userId, sendEvent);
 			sendEvent(`User ${userId} successfully connected to the Mail Button Events channel.`);
 
-		},
-		cancel() {
+			// Heartbeat: Send a comment line every 50 seconds to keep the connection alive
+			const heartbeatInterval = setInterval(() => {
+				controller.enqueue(':heartbeat\n\n');
+			}, 50000);
+
+			// Stop the heartbeat when the connection is closed
+			requestEvent.request.signal.addEventListener('abort', () => {
+				clearInterval(heartbeatInterval);
 			console.log(`[MailButtonEventsSSE] Connection closed for user ID: ${userId}`);
 			userMailButtonConnections.removeConnection(userId);
+			});
 		}
 	});
 
