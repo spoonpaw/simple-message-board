@@ -13,6 +13,7 @@
 	import QuillEditor from '$lib/client/components/common/QuillEditor.svelte';
 	import {getTextFromHtml} from "$lib/shared/htmlUtils/getTextFromHtml";
 	import { unreadMessagesStore } from '$lib/client/stores/unreadMessagesStore';
+	import {onDestroy, onMount} from "svelte";
 
 	export let data: PageServerData;
 
@@ -28,22 +29,24 @@
 	let messageContent = '';
 	let messageQuillEditor: QuillEditor; // Variable for Quill editor instance
 
+    let eventSource: EventSource | null = null;
+
     unreadMessagesStore.set(hasUnreadMessages);
 
-	// async function fetchReceivedMessages() {
-	// 	try {
-	// 		const response = await fetch('/mail/received');
-	// 		if (response.ok) {
-	// 			const data = await response.json();
-	// 			receivedMessages = data;
-	// 			console.log('Received messages updated:', receivedMessages);
-	// 		} else {
-	// 			console.error('Failed to fetch received messages:', response.status);
-	// 		}
-	// 	} catch (error) {
-	// 		console.error('Error fetching received messages:', error);
-	// 	}
-	// }
+	async function fetchReceivedMessages() {
+		try {
+			const response = await fetch('/mail/received');
+			if (response.ok) {
+				const data = await response.json();
+				receivedMessages = data;
+				console.log('Received messages updated:', receivedMessages);
+			} else {
+				console.error('Failed to fetch received messages:', response.status);
+			}
+		} catch (error) {
+			console.error('Error fetching received messages:', error);
+		}
+	}
 
 	function openComposeMessageModal() {
 		composeMessageModal = true;
@@ -238,6 +241,32 @@
 	// Character counters
 	$: messageSubjectLength = messageSubject.length;
 	$: messageContentLength = getTextFromHtml(messageContent).length;
+
+	onMount(() => {
+		console.log(`[MailPage] Mounting component and initializing SSE connection.`);
+		eventSource = new EventSource(`/events/mail-page`);
+
+		eventSource.onmessage = (event) => {
+			console.log(`[MailPage] Received event:`, event);
+			const eventData = JSON.parse(event.data);
+
+			if (eventData === 'newMessageReceived') {
+				console.log('[MailPage] New message received. Fetching messages.');
+				unreadMessagesStore.set(true);
+				fetchReceivedMessages(); // Call to fetch new messages
+			}
+		};
+
+		eventSource.onerror = (error) => {
+			console.error(`[MailPage] SSE connection error:`, error);
+			eventSource?.close();
+		};
+	});
+
+	onDestroy(() => {
+		console.log(`[MailPage] Unmounting component and closing SSE connection.`);
+		eventSource?.close();
+	});
 
 </script>
 

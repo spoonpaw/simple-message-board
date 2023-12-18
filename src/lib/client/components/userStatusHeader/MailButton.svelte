@@ -5,6 +5,38 @@
 	import {Mail} from '@steeze-ui/lucide-icons';
 	import {goto} from '$app/navigation';
     import { unreadMessagesStore } from '$lib/client/stores/unreadMessagesStore';
+	import { onMount, onDestroy } from 'svelte';
+
+	export let userId: string;
+    let eventSource: EventSource | null = null;
+
+
+	onMount(() => {
+        console.log(`[MailButton] Mounting component and initializing SSE connection.`);
+        eventSource = new EventSource(`/events/mail-button`);
+
+		eventSource.onmessage = (event) => {
+			console.log(`[MailButton] Received event:`, event);
+			const eventData = JSON.parse(event.data); // Parse the JSON string
+
+			if (eventData === 'newMessageReceived') {
+				console.log('[MailButton] New message received.');
+				unreadMessagesStore.set(true); // Updating unreadMessagesStore
+			}
+		};
+
+        eventSource.onerror = (error) => {
+            console.error(`[MailButton] SSE connection error:`, error);
+			if (eventSource) {
+				eventSource.close();
+            }
+        };
+	});
+
+	onDestroy(() => {
+        console.log(`[MailButton] Unmounting component and closing SSE connection.`);
+        eventSource?.close();
+	});
 
 	function navigateToMailPage() {
 		goto('/mail');
