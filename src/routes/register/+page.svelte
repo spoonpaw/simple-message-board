@@ -19,12 +19,28 @@
 		return true;
 	}
 
+	function validateUsernameLength() {
+		if (username.length < 3 || username.length > 20) {
+			errorMessage.set('Username must be between 3 and 20 characters.');
+			return false;
+		}
+		return true;
+	}
+
+	function validatePasswordLength() {
+		if (password.length < 8 || password.length > 64) {
+			errorMessage.set('Password must be between 8 and 64 characters.');
+			return false;
+		}
+		return true;
+	}
+
 	function passwordsMatch() {
 		return password === confirmPassword;
 	}
 
 	async function register() {
-		if (!validateEmail()) return;
+		if (!validateEmail() || !validateUsernameLength() || !validatePasswordLength()) return;
 		if (!passwordsMatch()) {
 			errorMessage.set('Passwords do not match.');
 			return;

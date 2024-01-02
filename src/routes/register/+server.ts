@@ -5,7 +5,7 @@ import {pool} from '$lib/server';
 import bcrypt from 'bcrypt';
 import validator from 'validator';
 import {sendEmail} from "$lib/server/email/sendEmail";
-import { env } from '$env/dynamic/private';
+import {env} from '$env/dynamic/private';
 
 export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
 	const {username, email, password} = await requestEvent.request.json();
@@ -14,9 +14,23 @@ export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
 	if (!validator.isEmail(email)) {
 		return new Response(JSON.stringify({error: 'Invalid email address.'}), {
 			status: 400,
-			headers: {
-				'Content-Type': 'application/json'
-			}
+			headers: {'Content-Type': 'application/json'}
+		});
+	}
+
+	// Validate username length
+	if (username.length < 3 || username.length > 20) {
+		return new Response(JSON.stringify({error: 'Username must be between 3 and 20 characters.'}), {
+			status: 400,
+			headers: {'Content-Type': 'application/json'}
+		});
+	}
+
+	// Validate password length
+	if (password.length < 8 || password.length > 64) {
+		return new Response(JSON.stringify({error: 'Password must be between 8 and 64 characters.'}), {
+			status: 400,
+			headers: {'Content-Type': 'application/json'}
 		});
 	}
 
