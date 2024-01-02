@@ -11,7 +11,7 @@
 	import {parse, HTMLElement} from 'node-html-parser';
 	import type {PostThreadView} from "$lib/shared/types/PostThreadView";
 	import Navbar from "$lib/client/components/common/Navbar.svelte";
-	import { unreadMessagesStore } from '$lib/client/stores/unreadMessagesStore';
+	import {unreadMessagesStore} from '$lib/client/stores/unreadMessagesStore';
 
 	export let data: PageServerData;
 	let {username, userid, thread, permissions, hasUnreadMessages} = data;
@@ -42,6 +42,14 @@
 		canDeleteAnyPost = permissions.some(permission => permission.name === 'delete_any_post');
 		canEditAnyPost = permissions.some(permission => permission.name === 'edit_any_post');
 		canAccessAdminPanel = permissions.some(permission => permission.name === 'access_admin_panel');
+	}
+
+	function addTargetBlankToLinks(htmlString: string) {
+		const root = parse(htmlString);
+		root.querySelectorAll('a').forEach((aTag) => {
+			aTag.setAttribute('target', '_blank');
+		});
+		return root.toString();
 	}
 
 	function handleNewPostTextChange(event: CustomEvent) {
@@ -215,8 +223,11 @@
 	}
 
 	function renderQuotedPost(quotedPost: PostThreadView): string {
-		// Parse the content as HTML
-		const root = parse(quotedPost.content);
+		// Apply addTargetBlankToLinks to quoted post content
+		const modifiedContent = addTargetBlankToLinks(quotedPost.content);
+
+		// Parse the modified content as HTML
+		const root = parse(modifiedContent);
 
 		// Modify all img tags to have a max height and width
 		root.querySelectorAll('img').forEach((img: HTMLElement) => {
@@ -377,7 +388,7 @@
                         {#if post.quotedPost}
                             {@html renderQuotedPost(post.quotedPost)}
                         {/if}
-                        <div class="formatted-content">{@html post.content}</div>
+                        <div class="formatted-content">{@html addTargetBlankToLinks(post.content)}</div>
                     </div>
 
                 </div>
