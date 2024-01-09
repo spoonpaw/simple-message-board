@@ -11,7 +11,7 @@ export async function POST(requestEvent: RequestEvent) {
 	const client = await pool.connect();
 	try {
 		const userResult = await client.query(
-			'SELECT id, email FROM users WHERE username = $1 OR email = $1',
+            'SELECT id, email, is_confirmed FROM users WHERE username = $1 OR email = $1',
 			[userIdentifier]
 		);
 
@@ -21,6 +21,12 @@ export async function POST(requestEvent: RequestEvent) {
 		}
 
 		const user = userResult.rows[0];
+
+        // Check if the user's account is confirmed
+        if (!user.is_confirmed) {
+            client.release();
+            return new Response(JSON.stringify({ error: 'Account not confirmed. Please confirm your account first.' }), { status: 403 });
+        }
 
 		// Update user with a new UUID as reset token and set its expiry
 		const resetTokenResult = await client.query(
