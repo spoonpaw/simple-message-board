@@ -26,6 +26,15 @@ export const POST: RequestHandler = async (requestEvent: RequestEvent) => {
 		});
 	}
 
+	// Validate username for allowed characters
+	const allowedCharacters = /^[a-zA-Z0-9._-]+$/;
+	if (!allowedCharacters.test(username)) {
+		return new Response(JSON.stringify({error: 'Username can only contain letters, numbers, dots (.), underscores (_), and hyphens (-).'}), {
+			status: 400,
+			headers: {'Content-Type': 'application/json'}
+		});
+	}
+
 	// Validate password length
 	if (password.length < 8 || password.length > 64) {
 		return new Response(JSON.stringify({error: 'Password must be between 8 and 64 characters.'}), {
