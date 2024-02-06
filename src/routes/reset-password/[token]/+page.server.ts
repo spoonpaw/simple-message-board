@@ -5,26 +5,34 @@ import type {RequestEvent} from '@sveltejs/kit';
 import {pool} from '$lib/server';
 
 export async function load(requestEvent: RequestEvent) {
-	const {params} = requestEvent;
-	const {token} = params;
+    const {params} = requestEvent;
+    const {token} = params;
 
-	const client = await pool.connect();
+    // Validate the token to ensure it's neither null nor an empty string
+    if (!token || token.trim() === '') {
+        throw error(404, 'Invalid or expired token');
+    }
 
-	try {
-		// Check if the token exists and is valid
-		const userResult = await client.query('SELECT id FROM users WHERE reset_token = $1 AND reset_token_expiry > NOW()', [token]);
+    const client = await pool.connect();
 
-		if (userResult.rowCount === 0) {
-			throw error(404, 'Invalid or expired token');
-		}
+    try {
+        // Check if the token exists, is valid, and is not expired
+        const userResult = await client.query(
+            'SELECT id FROM users WHERE reset_token = $1 AND reset_token IS NOT NULL AND reset_token <> \'\' AND reset_token_expiry > NOW()',
+            [token]
+        );
 
-		return {success: true, token: token};
+        if (userResult.rowCount === 0) {
+            throw error(404, 'Invalid or expired token');
+        }
 
-	} catch (err) {
-		// Handle the error, but don't release the client here
-		return {error: 'Server error while processing password reset request'};
-	} finally {
-		// Release the client in the finally block, ensuring it's only called once
-		client.release();
-	}
+        return {success: true, token: token};
+
+    } catch (err) {
+        // Since error handling is already provided, there's no need to modify this part
+        throw error(500, 'Server error while processing password reset request');
+    } finally {
+        // Ensure the database client is always released
+        client.release();
+    }
 }

@@ -1,51 +1,63 @@
 <!--src/routes/reset-password/[token]/+page.svelte-->
 <script lang="ts">
-	import type { PageServerData } from "./$types";
-	import { goto } from "$app/navigation";
+    import type {PageServerData} from "./$types";
+    import {goto} from "$app/navigation";
 
-	export let data: PageServerData;
+    export let data: PageServerData;
 
-	let newPassword = '';
-	let confirmPassword = '';
-	let errorMessage = '';
-	let successMessage = '';
-	let processing = false;
+    let newPassword = '';
+    let confirmPassword = '';
+    let errorMessage = '';
+    let successMessage = '';
+    let processing = false;
 
-	async function resetPassword() {
-		if (newPassword !== confirmPassword) {
-			errorMessage = 'Passwords do not match.';
-			return;
-		}
+    function validatePasswordLength() {
+        if (newPassword.length < 8 || newPassword.length > 64) {
+            errorMessage = 'Password must be between 8 and 64 characters.';
+            return false;
+        }
+        return true;
+    }
 
-		errorMessage = '';
-		successMessage = '';
-		processing = true;
+    function passwordsMatch() {
+        return newPassword === confirmPassword;
+    }
 
-		try {
-			const response = await fetch(`/reset-password/${data.token}`, {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ newPassword })
-			});
+    async function resetPassword() {
+        if (!validatePasswordLength() || !passwordsMatch()) {
+            errorMessage = passwordsMatch() ? errorMessage : 'Passwords do not match.';
+            return;
+        }
 
-			const result = await response.json();
+        errorMessage = '';
+        successMessage = '';
+        processing = true;
 
-			if (response.ok) {
-				successMessage = 'Password successfully reset.';
-				setTimeout(() => goto('/login'), 3000); // Redirect to login after 3 seconds
-			} else {
-				errorMessage = result.error || 'An error occurred while resetting your password.';
-			}
-		} catch (error) {
-			errorMessage = 'An error occurred while resetting your password.';
-		} finally {
-			processing = false;
-		}
-	}
+        try {
+            const response = await fetch(`/reset-password/${data.token}`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({newPassword})
+            });
 
-	function redirectToHome() {
-		goto('/');
-	}
+            const result = await response.json();
+
+            if (response.ok) {
+                successMessage = 'Password successfully reset.';
+                setTimeout(() => goto('/login'), 3000); // Redirect to login after 3 seconds
+            } else {
+                errorMessage = result.error || 'An error occurred while resetting your password.';
+            }
+        } catch (error) {
+            errorMessage = 'An error occurred while resetting your password.';
+        } finally {
+            processing = false;
+        }
+    }
+
+    function redirectToHome() {
+        goto('/');
+    }
 </script>
 
 <main class="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
@@ -55,7 +67,8 @@
                 <h2 class="mb-4 text-xl font-semibold text-gray-900 text-center">Reset Password</h2>
                 <form on:submit|preventDefault={resetPassword} class="space-y-6">
                     <div>
-                        <label for="newPassword" class="text-sm font-medium text-gray-700 block mb-2">New Password:</label>
+                        <label for="newPassword" class="text-sm font-medium text-gray-700 block mb-2">New
+                            Password:</label>
                         <input
                                 id="newPassword"
                                 type="password"
@@ -65,7 +78,8 @@
                         />
                     </div>
                     <div>
-                        <label for="confirmPassword" class="text-sm font-medium text-gray-700 block mb-2">Confirm Password:</label>
+                        <label for="confirmPassword" class="text-sm font-medium text-gray-700 block mb-2">Confirm
+                            Password:</label>
                         <input
                                 id="confirmPassword"
                                 type="password"
