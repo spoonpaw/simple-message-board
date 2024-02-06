@@ -18,7 +18,7 @@ export async function load(requestEvent: RequestEvent) {
     try {
         // Check if the token exists, is valid, and is not expired
         const userResult = await client.query(
-            'SELECT id FROM users WHERE reset_token = $1 AND reset_token IS NOT NULL AND reset_token <> \'\' AND reset_token_expiry > NOW()',
+            'SELECT id FROM users WHERE reset_token = $1 AND reset_token IS NOT NULL AND reset_token_expiry > NOW()',
             [token]
         );
 

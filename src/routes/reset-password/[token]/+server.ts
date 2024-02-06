@@ -23,7 +23,7 @@ export async function POST(requestEvent: RequestEvent) {
     try {
         // Verify the token is valid, not expired, and not an empty string
         const tokenVerification = await client.query(
-            'SELECT id FROM users WHERE reset_token = $1 AND reset_token IS NOT NULL AND reset_token <> \'\' AND reset_token_expiry > NOW()',
+            'SELECT id FROM users WHERE reset_token = $1 AND reset_token IS NOT NULL AND reset_token_expiry > NOW()',
             [token]
         );
 

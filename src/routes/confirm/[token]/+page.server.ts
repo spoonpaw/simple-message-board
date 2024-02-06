@@ -17,7 +17,7 @@ export async function load(requestEvent: RequestEvent) {
 
     try {
         // Check if the token exists and is valid
-        const userResult = await client.query('SELECT id, is_confirmed FROM users WHERE confirmation_token = $1 AND confirmation_token IS NOT NULL AND confirmation_token <> \'\'', [token]);
+        const userResult = await client.query('SELECT id, is_confirmed FROM users WHERE confirmation_token = $1 AND confirmation_token IS NOT NULL', [token]);
 
         if (userResult.rowCount === 0) {
             client.release();
